@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/drawable/ic_android_black_24dp.xml" value="0.1855" />
+        <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/drawable/icon_clock.xml" value="0.1855" />
+        <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/drawable/icon_graph.xml" value="0.1855" />
+        <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/drawable/icon_home.xml" value="0.1855" />
+        <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/drawable/icon_marker_1.xml" value="0.1855" />
+        <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/drawable/some_id.xml" value="0.1855" />
+        <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/drawable/tabs_3_icon.xml" value="0.1855" />
+        <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/drawable/tabs_3_icon_vector.xml" value="0.1855" />
+        <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/layout/activity_maps.xml" value="0.2203125" />
+        <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/layout/layout_main.xml" value="0.22395833333333334" />
+        <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/layout/map_in_linear.xml" value="0.22395833333333334" />
+        <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/layout/playmap_main.xml" value="0.1431159420289855" />
+        <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/layout/tab_icons_3.xml" value="0.1431159420289855" />
+        <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/layout/tabs_3_icon.xml" value="0.4" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
