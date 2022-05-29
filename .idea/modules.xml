@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/PlayMap-1.iml" filepath="$PROJECT_DIR$/.idea/modules/PlayMap-1.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/PlayMap-1.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/PlayMap-1.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/playmapApp.iml" filepath="$PROJECT_DIR$/.idea/modules/playmapApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/playmapApp.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/playmapApp.app.iml" />
     </modules>
   </component>
 </project>
