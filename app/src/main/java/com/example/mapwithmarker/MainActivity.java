@@ -80,35 +80,28 @@ public class MainActivity extends AppCompatActivity
     LinearLayout[] main_pages;
     Animation translateLeftIn, translateRightIn, translateLeftOut, translateRightOut;
 
-    // The entry point to the Places API.
     private PlacesClient placesClient;
 
-    // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient fusedLocationProviderClient;
 
-    // A default location (Sydney, Australia) and default zoom to use when location permission is
-    // not granted.
     private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean locationPermissionGranted;
 
-    // The geographical location where the device is currently located. That is, the last-known
-    // location retrieved by the Fused Location Provider.
     private Location lastKnownLocation;
 
-    // Keys for storing activity state.
-    // [START maps_current_place_state_keys]
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
-    // [END maps_current_place_state_keys]
 
-    // Used for selecting the current place.
     private static final int M_MAX_ENTRIES = 5;
     private String[] likelyPlaceNames;
     private String[] likelyPlaceAddresses;
     private List[] likelyPlaceAttributions;
     private LatLng[] likelyPlaceLatLngs;
+
+    Server server;
+    final String PHP_SERVER_URL = "http://121.124.124.95/PHP_connection.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,36 +188,10 @@ public class MainActivity extends AppCompatActivity
             원래는 FrameLayout에 버튼과 이미지+텍스트를 표시하는 레이아웃을 중첩시켰지만,
             Button 대신 LinearLayout에서 clickable 속성을 true로 해준 뒤, 클릭 리스너를 등록시켰습니다.
          */
-        findViewById(R.id.btn_moveTo_page_0).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                view.setBackgroundColor(colAccent);
-                //Toast.makeText(MainActivity.this, "Button 1 Clicked", Toast.LENGTH_SHORT).show();
-                movePage(currentPage,0);
-                findViewById(R.id.btn_moveTo_page_1).setBackgroundColor(colPrimary);
-                findViewById(R.id.btn_moveTo_page_2).setBackgroundColor(colPrimary);
-            }
-        });
-        findViewById(R.id.btn_moveTo_page_1).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                view.setBackgroundColor(colAccent);
-                //Toast.makeText(MainActivity.this, "Button 2 Clicked", Toast.LENGTH_SHORT).show();
-                movePage(currentPage,1);
-                findViewById(R.id.btn_moveTo_page_0).setBackgroundColor(colPrimary);
-                findViewById(R.id.btn_moveTo_page_2).setBackgroundColor(colPrimary);
-            }
-        });
-        findViewById(R.id.btn_moveTo_page_2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                view.setBackgroundColor(colAccent);
-                //Toast.makeText(MainActivity.this, "Button 2 Clicked", Toast.LENGTH_SHORT).show();
-                movePage(currentPage,2);
-                findViewById(R.id.btn_moveTo_page_1).setBackgroundColor(colPrimary);
-                findViewById(R.id.btn_moveTo_page_0).setBackgroundColor(colPrimary);
-            }
-        });
+        findViewById(R.id.btn_moveTo_page_0).setOnClickListener(mOnclickListener);
+        findViewById(R.id.btn_moveTo_page_1).setOnClickListener(mOnclickListener);
+        findViewById(R.id.btn_moveTo_page_2).setOnClickListener(mOnclickListener);
+        findViewById(R.id.btn_getServerData).setOnClickListener(mOnclickListener);
 
         colPrimary = ContextCompat.getColor(MainActivity.this, R.color.colorPrimary);
         colAccent = ContextCompat.getColor(MainActivity.this, R.color.colorAccent);
@@ -300,7 +267,39 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        server = new Server(this,PHP_SERVER_URL);
+        //server.showData();
+
     }
+
+    View.OnClickListener mOnclickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()){
+                case R.id.btn_moveTo_page_0:
+                    view.setBackgroundColor(colAccent);
+                    movePage(currentPage,0);
+                    findViewById(R.id.btn_moveTo_page_1).setBackgroundColor(colPrimary);
+                    findViewById(R.id.btn_moveTo_page_2).setBackgroundColor(colPrimary);
+                    break;
+                case R.id.btn_moveTo_page_1:
+                    view.setBackgroundColor(colAccent);
+                    movePage(currentPage,1);
+                    findViewById(R.id.btn_moveTo_page_0).setBackgroundColor(colPrimary);
+                    findViewById(R.id.btn_moveTo_page_2).setBackgroundColor(colPrimary);
+                    break;
+                case R.id.btn_moveTo_page_2:
+                    view.setBackgroundColor(colAccent);
+                    movePage(currentPage,2);
+                    findViewById(R.id.btn_moveTo_page_1).setBackgroundColor(colPrimary);
+                    findViewById(R.id.btn_moveTo_page_0).setBackgroundColor(colPrimary);
+                    break;
+                case R.id.btn_getServerData:
+                    server.showData();
+                    break;
+            }
+        }
+    };
 
     /*
         oldPage: 이전 페이지, 애니메이션에서 밖으로 밀려나가는 페이지입니다

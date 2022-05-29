@@ -37,6 +37,13 @@
                 android:layout_height="wrap_content"
                 android:text="2페이지입니다"
                 android:textSize="10pt" />
+
+            <Button android:id="@+id/btn_getServerData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="get server data"
+                android:textSize="10pt"/>
+
         </LinearLayout>
 
         <!-- PAGE 2 -->
