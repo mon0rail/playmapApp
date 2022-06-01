@@ -22,6 +22,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
  */
 public class mMarker{
 
+    String id;
+    double lat, lon;
     LatLng latLng;
     MainActivity mainActivity;
     GoogleMap map;
@@ -33,6 +35,14 @@ public class mMarker{
         map = googleMap;
         add();
     }
+
+    public String getId(){ return id; }
+    public String getLat(){ return Double.toString(lat); }
+    public String getLon(){ return Double.toString(lon); }
+
+    public void setId(String id) { this.id = id; }
+    public void setLat(double lat) { this.lat = lat; }
+    public void setLon(double lon) { this.lon = lon; }
 
     /*
         이 메소드는 처음 계획시 add(googleMap)으로 하려고 하였으나,

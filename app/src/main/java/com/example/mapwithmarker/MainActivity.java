@@ -17,6 +17,7 @@ package com.example.mapwithmarker;
 import static com.google.android.gms.maps.UiSettings.*;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -26,13 +27,16 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -43,6 +47,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -66,6 +72,17 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -100,8 +117,20 @@ public class MainActivity extends AppCompatActivity
     private List[] likelyPlaceAttributions;
     private LatLng[] likelyPlaceLatLngs;
 
-    Server server;
-    final String PHP_SERVER_URL = "http://121.124.124.95/PHP_connection.php";
+    private static String IP_ADDRESS = "121.124.124.95";
+    private static String PHP_TAG = "phpexample";
+
+    private EditText mEditTextLat;
+    private EditText mEditTextLon;
+    private TextView mTextViewResult;
+    private ArrayList<mMarker> mArrayList;
+    private MarkersAdapter mAdapter;
+    private RecyclerView mRecyclerView;
+    private EditText mEditTextSearchKeyword;
+    private String mJsonString;
+
+    //Server server;
+    //final String PHP_SERVER_URL = "http://121.124.124.95/PHP_connection.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -267,9 +296,73 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        server = new Server(this,PHP_SERVER_URL);
-        //server.showData();
+        mEditTextLat = (EditText)findViewById(R.id.editText_main_lat);
+        mEditTextLon = (EditText)findViewById(R.id.editText_main_lon);
+        mTextViewResult = (TextView)findViewById(R.id.textView_main_result);
+        mRecyclerView = (RecyclerView) findViewById(R.id.listView_main_list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        //mEditTextSearchKeyword = (EditText) findViewById(R.id.editText_main_searchKeyword);
+
+        mTextViewResult.setMovementMethod(new ScrollingMovementMethod());
+
+
+
+        mArrayList = new ArrayList<>();
+
+        mAdapter = new MarkersAdapter(this, mArrayList);
+        mRecyclerView.setAdapter(mAdapter);
+
+
+        Button buttonInsert = (Button)findViewById(R.id.button_main_insert);
+        buttonInsert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String name = mEditTextLat.getText().toString();
+                String country = mEditTextLon.getText().toString();
+
+                InsertData task = new InsertData();
+                task.execute("http://" + IP_ADDRESS + "/insert.php", name,country);
+
+
+                mEditTextLat.setText("");
+                mEditTextLon.setText("");
+
+            }
+        });
+
+        /*
+        Button button_search = (Button) findViewById(R.id.button_main_search);
+        button_search.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                mArrayList.clear();
+                mAdapter.notifyDataSetChanged();
+
+
+                String Keyword =  mEditTextSearchKeyword.getText().toString();
+                mEditTextSearchKeyword.setText("");
+
+                GetData task = new GetData();
+                task.execute( "http://" + IP_ADDRESS + "/query.php", Keyword);
+            }
+        });
+
+         */
+
+
+        Button button_all = (Button) findViewById(R.id.button_main_all);
+        button_all.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                mArrayList.clear();
+                mAdapter.notifyDataSetChanged();
+
+                GetData task = new GetData();
+                task.execute( "http://" + IP_ADDRESS + "/getjson.php", "");
+            }
+        });
     }
 
     View.OnClickListener mOnclickListener = new View.OnClickListener() {
@@ -294,9 +387,12 @@ public class MainActivity extends AppCompatActivity
                     findViewById(R.id.btn_moveTo_page_1).setBackgroundColor(colPrimary);
                     findViewById(R.id.btn_moveTo_page_0).setBackgroundColor(colPrimary);
                     break;
+                    /*
                 case R.id.btn_getServerData:
                     server.showData();
                     break;
+
+                     */
             }
         }
     };
@@ -555,7 +651,240 @@ public class MainActivity extends AppCompatActivity
         }
     }
     // [END maps_current_place_update_location_ui]
+
+    class InsertData extends AsyncTask<String, Void, String> {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(MainActivity.this,
+                    "Please Wait", null, true, true);
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+            mTextViewResult.setText(result);
+            Log.d(PHP_TAG, "POST response  - " + result);
+        }
+
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String name = (String)params[1];
+            String country = (String)params[2];
+
+            String serverURL = (String)params[0];
+            String postParameters = "lat=" + name + "&lon=" + country;
+
+
+            try {
+
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
+
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(PHP_TAG, "POST response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+
+
+                bufferedReader.close();
+
+
+                return sb.toString();
+
+
+            } catch (Exception e) {
+
+                Log.d(PHP_TAG, "InsertData: Error ", e);
+
+                return new String("Error: " + e.getMessage());
+            }
+
+        }
+    }
+
+
+    private class GetData extends AsyncTask<String, Void, String>{
+
+        ProgressDialog progressDialog;
+        String errorString = null;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(MainActivity.this,
+                    "Please Wait", null, true, true);
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+            mTextViewResult.setText(result);
+            Log.d(PHP_TAG, "response - " + result);
+
+            if (result == null){
+
+                mTextViewResult.setText(errorString);
+            }
+            else {
+
+                mJsonString = result;
+                showResult();
+            }
+        }
+
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String serverURL = params[0];
+            String postParameters = "lon=" + params[1];
+
+
+            try {
+
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.connect();
+
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(PHP_TAG, "response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line;
+
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+
+                bufferedReader.close();
+
+                return sb.toString().trim();
+
+
+            } catch (Exception e) {
+
+                Log.d(PHP_TAG, "InsertData: Error ", e);
+                errorString = e.toString();
+
+                return null;
+            }
+
+        }
+    }
+
+
+    private void showResult(){
+
+        String TAG_JSON="root";
+        String TAG_ID = "id";
+        String TAG_LAT = "lat";
+        String TAG_LON ="lon";
+
+
+        try {
+            JSONObject jsonObject = new JSONObject(mJsonString);
+            JSONArray jsonArray = jsonObject.getJSONArray(TAG_JSON);
+
+            for(int i=0;i<jsonArray.length();i++){
+
+                JSONObject item = jsonArray.getJSONObject(i);
+
+                String id = item.getString(TAG_ID);
+                double lat = Double.parseDouble(item.getString(TAG_LAT));
+                double lon = Double.parseDouble(item.getString(TAG_LON));
+                LatLng loc = new LatLng(lat, lon);
+
+                mMarker mMarker = new mMarker(MainActivity.this, loc, map);
+
+                mMarker.setId(id);
+                mMarker.setLat(lat);
+                mMarker.setLon(lon);
+
+                mArrayList.add(mMarker);
+                mAdapter.notifyDataSetChanged();
+            }
+
+
+
+        } catch (JSONException e) {
+
+            Log.d(PHP_TAG, "showResult : ", e);
+        }
+
+    }
+
 }
+
+
+
 
 
 

@@ -51,13 +51,79 @@
             android:id="@+id/main_pages_2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:orientation="vertical"
             android:visibility="invisible">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="3페이지입니다"
-                android:textSize="10pt" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="8.5"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_marginBottom="5dp"
+                    android:text="위도와 경도를 입력한 뒤, 마커를 등록하세요. 위도 및 경도는 소수점 4자리까지만 가능합니다."
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView_main_input" />
+
+                <EditText
+                    android:layout_margin="5dp"
+                    android:hint = "위도를 입력하세요"
+                    android:inputType="numberDecimal|numberSigned"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/editText_main_lat" />
+
+                <EditText
+                    android:layout_margin="5dp"
+                    android:hint = "경도를 입력하세요."
+                    android:inputType="numberDecimal|numberSigned"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/editText_main_lon" />
+
+                <Button
+                    android:layout_margin="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="마커 등록"
+                    android:id="@+id/button_main_insert" />
+
+                <Button
+                    android:layout_margin="2dp"
+                    android:id="@+id/button_main_all"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="마커 불러오기 &amp; 지도 업데이트" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_margin="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="6"
+                    android:id="@+id/listView_main_list" />
+
+
+                <!--- 디버깅 용 -->
+                <TextView
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="5dp"
+                    android:text="통신 결과:"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView_main_debug" />
+
+                <TextView
+                    android:layout_margin="5dp"
+                    android:id="@+id/textView_main_result"
+                    android:scrollbars = "vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1.5" />
+            </LinearLayout>
+
+
         </LinearLayout>
 
     </FrameLayout>

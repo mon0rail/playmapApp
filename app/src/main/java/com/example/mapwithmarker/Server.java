@@ -29,12 +29,12 @@ public class Server {
 
     MainActivity mainActivity;
 
-    public Server(MainActivity Act, String url){
+    public Server(MainActivity Act, String url) {
         mainActivity = Act;
         getData(url);
     }
 
-    private void getData(String url){
+    private void getData(String url) {
         class GetDataJSON extends AsyncTask<String, Void, String> {
 
             @Override
@@ -74,7 +74,7 @@ public class Server {
         g.execute(url);
     }
 
-    public void showData(){
+    public void showData() {
         Toast.makeText(mainActivity, myJSON, Toast.LENGTH_LONG).show();
     }
 }
