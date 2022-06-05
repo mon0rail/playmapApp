@@ -14,6 +14,7 @@
 
 package com.example.mapwithmarker;
 
+import static com.example.mapwithmarker.Database.DB_TABLE_NAME;
 import static com.google.android.gms.maps.UiSettings.*;
 
 import android.app.Activity;
@@ -21,6 +22,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -89,6 +91,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
+
     private static final String TAG = MainActivity.class.getSimpleName();
     private GoogleMap map;
     private CameraPosition cameraPosition;
@@ -120,6 +123,7 @@ public class MainActivity extends AppCompatActivity
 
     //Server server;
     //final String PHP_SERVER_URL = "http://121.124.124.95/PHP_connection.php";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,8 +183,8 @@ public class MainActivity extends AppCompatActivity
             객체 생성시 매개 변수로는 [현재 Activity, 위치(LatLng), 지도]가 들어갑니다.
          */
         LatLng loc = new LatLng(36.99502, 127.13327);
-        mMarker marker = new mMarker(MainActivity.this, loc, googleMap);
-        marker.focus(18);
+        //mMarker marker = new mMarker(MainActivity.this, loc, googleMap);
+        //marker.focus(18);
 
         onActivityReady();
 
@@ -228,6 +232,10 @@ public class MainActivity extends AppCompatActivity
         main_pages[1].addView(View.inflate(this, R.layout.page_1, null));
         main_pages[2] = (LinearLayout) findViewById(R.id.main_pages_2);
         main_pages[2].addView(View.inflate(this, R.layout.page_2, null));
+
+        findViewById(R.id.page_2_add_marker).setOnClickListener(mOnclickListener);
+        findViewById(R.id.page_2_reload_markers).setOnClickListener(mOnclickListener);
+        findViewById(R.id.page_2_reset_all_markers).setOnClickListener(mOnclickListener);
 
         /*
             페이지 전환 애니메이션 로드 & 리스너 등록입니다. 아래 링크를 참고하였습니다.
@@ -288,6 +296,8 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        reloadAllMarkers();
+
     }
 
     View.OnClickListener mOnclickListener = new View.OnClickListener() {
@@ -312,12 +322,29 @@ public class MainActivity extends AppCompatActivity
                     findViewById(R.id.btn_moveTo_page_1).setBackgroundColor(colPrimary);
                     findViewById(R.id.btn_moveTo_page_0).setBackgroundColor(colPrimary);
                     break;
-                    /*
-                case R.id.btn_getServerData:
-                    server.showData();
+                case R.id.page_2_add_marker:
+                    EditText editLat = (EditText)findViewById(R.id.page_2_lat);
+                    EditText editLng = (EditText)findViewById(R.id.page_2_lng);
+                    String latStr = editLat.getText().toString();
+                    String lngStr = editLng.getText().toString();
+                    if (latStr.length() != 0 && lngStr.length() != 0){
+                        double lat = Double.parseDouble(latStr);
+                        double lng = Double.parseDouble(lngStr);
+                        createNewMarker(lat, lng);
+                        showToast("마커가 추가되었습니다.");
+                        movePage(2,0);
+                        editLat.setText("");
+                        editLng.setText("");
+                    } else {
+                        showToast("위도와 경도를 입력해주세요.");
+                    }
                     break;
-
-                     */
+                case R.id.page_2_reload_markers:
+                    reloadAllMarkers();
+                    break;
+                case R.id.page_2_reset_all_markers:
+                    resetAllMarkers();
+                    break;
             }
         }
     };
@@ -576,6 +603,51 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    void createNewMarker(double lat, double lng){
+        LatLng loc = new LatLng(lat, lng);
+        mMarker marker = new mMarker(MainActivity.this, loc, map);
+        if (!marker.addToDatebase()){
+            showToast("중복되는 데이터가 이미 DB에 존재합니다");
+        }
+        marker.focus(15);
+    }
+
+    void resetAllMarkers(){
+        map.clear();
+        Database db = new Database(this);
+        db.execSQL("DELETE FROM "+DB_TABLE_NAME);
+        db.close();
+        showToast("모든 마커를 삭제했습니다.");
+        //reloadAllMarkers();
+    }
+
+    void reloadAllMarkers(){
+        //TextView result = new TextView(this);
+        Database db = new Database(this);
+        double lat, lng;
+        LatLng loc;
+        mMarker marker;
+
+        map.clear();
+        Cursor cursor = db.querySQL("SELECT * FROM "+DB_TABLE_NAME);
+        if (cursor.getCount() != 0){
+            while (cursor.moveToNext()){
+                lat = Double.parseDouble(cursor.getString(0));
+                lng = Double.parseDouble(cursor.getString(1));
+                loc = new LatLng(lat,lng);
+                marker = new mMarker(MainActivity.this, loc, map);
+                marker.addToDatebase();
+            }
+        }
+        showToast("모든 마커를 불러왔습니다.");
+
+        db.close();
+    }
+
+    void showToast(String msg){
+        Toast toast = Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT);
+        toast.show();
+    }
 }
 
 

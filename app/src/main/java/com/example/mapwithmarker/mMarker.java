@@ -2,9 +2,11 @@ package com.example.mapwithmarker;
 
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
@@ -13,7 +15,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /*
@@ -22,41 +23,49 @@ import com.google.android.gms.maps.model.MarkerOptions;
  */
 public class mMarker{
 
-    String id;
-    double lat, lon;
-    LatLng latLng;
-    MainActivity mainActivity;
-    GoogleMap map;
+    private LatLng latLng;
+    private MainActivity mainActivity;
+    private GoogleMap map;
+    private Database db;
+    private double lat;
+    private double lng;
 
     public mMarker(MainActivity mActivity, LatLng loc, GoogleMap googleMap) {
-        latLng = loc;
         mainActivity = mActivity;
+        latLng = loc;
+        lat = latLng.latitude;
+        lng = latLng.longitude;
 
         map = googleMap;
-        add();
+        this.addToMap();
+        //this.addToDatebase();
     }
-
-    public String getId(){ return id; }
-    public String getLat(){ return Double.toString(lat); }
-    public String getLon(){ return Double.toString(lon); }
-
-    public void setId(String id) { this.id = id; }
-    public void setLat(double lat) { this.lat = lat; }
-    public void setLon(double lon) { this.lon = lon; }
 
     /*
         이 메소드는 처음 계획시 add(googleMap)으로 하려고 하였으나,
         내부 메소드로 바꿔 객체 생성 시 자동으로 구글맵에 마커를 추가시켜주도록 하였습니다.
      */
-    private boolean add(){
-        Marker marker = map.addMarker(
-                new MarkerOptions()
-                        .position(latLng)
-                        .title("Custom marker")
-                        .snippet("description")
-                        .icon(bitmapDescriptorFromVector(mainActivity, R.drawable.icon_marker_1)));
+    private void addToMap(){
+        map.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title("Custom marker")
+                .snippet("위도:"+lat+", 경도:"+lng)
+                .icon(bitmapDescriptorFromVector(mainActivity, R.drawable.icon_marker_1)));
 
-        return true;
+    }
+
+    public boolean addToDatebase(){
+        db = new Database(mainActivity);
+        Cursor cursor = db.querySQL("SELECT * FROM test1 WHERE lat="+lat+" AND lng="+lng);
+        if (cursor.getCount() == 0){
+            db.execSQL(String.format(
+                    "INSERT INTO test1 VALUES("+lat+","+lng+");"
+            ));
+            db.close();
+            return true;
+        }
+        db.close();
+        return false;
     }
 
     /*
