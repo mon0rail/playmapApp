@@ -117,17 +117,6 @@ public class MainActivity extends AppCompatActivity
     private List[] likelyPlaceAttributions;
     private LatLng[] likelyPlaceLatLngs;
 
-    private static String IP_ADDRESS = "121.124.124.95";
-    private static String PHP_TAG = "phpexample";
-
-    private EditText mEditTextLat;
-    private EditText mEditTextLon;
-    private TextView mTextViewResult;
-    private ArrayList<mMarker> mArrayList;
-    private MarkersAdapter mAdapter;
-    private RecyclerView mRecyclerView;
-    private EditText mEditTextSearchKeyword;
-    private String mJsonString;
 
     //Server server;
     //final String PHP_SERVER_URL = "http://121.124.124.95/PHP_connection.php";
@@ -220,7 +209,7 @@ public class MainActivity extends AppCompatActivity
         findViewById(R.id.btn_moveTo_page_0).setOnClickListener(mOnclickListener);
         findViewById(R.id.btn_moveTo_page_1).setOnClickListener(mOnclickListener);
         findViewById(R.id.btn_moveTo_page_2).setOnClickListener(mOnclickListener);
-        findViewById(R.id.btn_getServerData).setOnClickListener(mOnclickListener);
+        //findViewById(R.id.btn_getServerData).setOnClickListener(mOnclickListener);
 
         colPrimary = ContextCompat.getColor(MainActivity.this, R.color.colorPrimary);
         colAccent = ContextCompat.getColor(MainActivity.this, R.color.colorAccent);
@@ -234,8 +223,11 @@ public class MainActivity extends AppCompatActivity
          */
         main_pages = new LinearLayout[MAX_PAGES];
         main_pages[0] = (LinearLayout) findViewById(R.id.main_pages_0);
+      //  main_pages[0].addView(View.inflate(this, R.layout.page_0, null));
         main_pages[1] = (LinearLayout) findViewById(R.id.main_pages_1);
+        main_pages[1].addView(View.inflate(this, R.layout.page_1, null));
         main_pages[2] = (LinearLayout) findViewById(R.id.main_pages_2);
+        main_pages[2].addView(View.inflate(this, R.layout.page_2, null));
 
         /*
             페이지 전환 애니메이션 로드 & 리스너 등록입니다. 아래 링크를 참고하였습니다.
@@ -296,73 +288,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        mEditTextLat = (EditText)findViewById(R.id.editText_main_lat);
-        mEditTextLon = (EditText)findViewById(R.id.editText_main_lon);
-        mTextViewResult = (TextView)findViewById(R.id.textView_main_result);
-        mRecyclerView = (RecyclerView) findViewById(R.id.listView_main_list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        //mEditTextSearchKeyword = (EditText) findViewById(R.id.editText_main_searchKeyword);
-
-        mTextViewResult.setMovementMethod(new ScrollingMovementMethod());
-
-
-
-        mArrayList = new ArrayList<>();
-
-        mAdapter = new MarkersAdapter(this, mArrayList);
-        mRecyclerView.setAdapter(mAdapter);
-
-
-        Button buttonInsert = (Button)findViewById(R.id.button_main_insert);
-        buttonInsert.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String name = mEditTextLat.getText().toString();
-                String country = mEditTextLon.getText().toString();
-
-                InsertData task = new InsertData();
-                task.execute("http://" + IP_ADDRESS + "/insert.php", name,country);
-
-
-                mEditTextLat.setText("");
-                mEditTextLon.setText("");
-
-            }
-        });
-
-        /*
-        Button button_search = (Button) findViewById(R.id.button_main_search);
-        button_search.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                mArrayList.clear();
-                mAdapter.notifyDataSetChanged();
-
-
-                String Keyword =  mEditTextSearchKeyword.getText().toString();
-                mEditTextSearchKeyword.setText("");
-
-                GetData task = new GetData();
-                task.execute( "http://" + IP_ADDRESS + "/query.php", Keyword);
-            }
-        });
-
-         */
-
-
-        Button button_all = (Button) findViewById(R.id.button_main_all);
-        button_all.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                mArrayList.clear();
-                mAdapter.notifyDataSetChanged();
-
-                GetData task = new GetData();
-                task.execute( "http://" + IP_ADDRESS + "/getjson.php", "");
-            }
-        });
     }
 
     View.OnClickListener mOnclickListener = new View.OnClickListener() {
@@ -649,236 +574,6 @@ public class MainActivity extends AppCompatActivity
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
         }
-    }
-    // [END maps_current_place_update_location_ui]
-
-    class InsertData extends AsyncTask<String, Void, String> {
-        ProgressDialog progressDialog;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            progressDialog = ProgressDialog.show(MainActivity.this,
-                    "Please Wait", null, true, true);
-        }
-
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-
-            progressDialog.dismiss();
-            mTextViewResult.setText(result);
-            Log.d(PHP_TAG, "POST response  - " + result);
-        }
-
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            String name = (String)params[1];
-            String country = (String)params[2];
-
-            String serverURL = (String)params[0];
-            String postParameters = "lat=" + name + "&lon=" + country;
-
-
-            try {
-
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-
-
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-
-
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
-                outputStream.flush();
-                outputStream.close();
-
-
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                Log.d(PHP_TAG, "POST response code - " + responseStatusCode);
-
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-
-
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-                StringBuilder sb = new StringBuilder();
-                String line = null;
-
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-
-
-                bufferedReader.close();
-
-
-                return sb.toString();
-
-
-            } catch (Exception e) {
-
-                Log.d(PHP_TAG, "InsertData: Error ", e);
-
-                return new String("Error: " + e.getMessage());
-            }
-
-        }
-    }
-
-
-    private class GetData extends AsyncTask<String, Void, String>{
-
-        ProgressDialog progressDialog;
-        String errorString = null;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            progressDialog = ProgressDialog.show(MainActivity.this,
-                    "Please Wait", null, true, true);
-        }
-
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-
-            progressDialog.dismiss();
-            mTextViewResult.setText(result);
-            Log.d(PHP_TAG, "response - " + result);
-
-            if (result == null){
-
-                mTextViewResult.setText(errorString);
-            }
-            else {
-
-                mJsonString = result;
-                showResult();
-            }
-        }
-
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            String serverURL = params[0];
-            String postParameters = "lon=" + params[1];
-
-
-            try {
-
-                URL url = new URL(serverURL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-
-
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setDoInput(true);
-                httpURLConnection.connect();
-
-
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                outputStream.write(postParameters.getBytes("UTF-8"));
-                outputStream.flush();
-                outputStream.close();
-
-
-                int responseStatusCode = httpURLConnection.getResponseCode();
-                Log.d(PHP_TAG, "response code - " + responseStatusCode);
-
-                InputStream inputStream;
-                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
-                    inputStream = httpURLConnection.getInputStream();
-                }
-                else{
-                    inputStream = httpURLConnection.getErrorStream();
-                }
-
-
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-                StringBuilder sb = new StringBuilder();
-                String line;
-
-                while((line = bufferedReader.readLine()) != null){
-                    sb.append(line);
-                }
-
-                bufferedReader.close();
-
-                return sb.toString().trim();
-
-
-            } catch (Exception e) {
-
-                Log.d(PHP_TAG, "InsertData: Error ", e);
-                errorString = e.toString();
-
-                return null;
-            }
-
-        }
-    }
-
-
-    private void showResult(){
-
-        String TAG_JSON="root";
-        String TAG_ID = "id";
-        String TAG_LAT = "lat";
-        String TAG_LON ="lon";
-
-
-        try {
-            JSONObject jsonObject = new JSONObject(mJsonString);
-            JSONArray jsonArray = jsonObject.getJSONArray(TAG_JSON);
-
-            for(int i=0;i<jsonArray.length();i++){
-
-                JSONObject item = jsonArray.getJSONObject(i);
-
-                String id = item.getString(TAG_ID);
-                double lat = Double.parseDouble(item.getString(TAG_LAT));
-                double lon = Double.parseDouble(item.getString(TAG_LON));
-                LatLng loc = new LatLng(lat, lon);
-
-                mMarker mMarker = new mMarker(MainActivity.this, loc, map);
-
-                mMarker.setId(id);
-                mMarker.setLat(lat);
-                mMarker.setLon(lon);
-
-                mArrayList.add(mMarker);
-                mAdapter.notifyDataSetChanged();
-            }
-
-
-
-        } catch (JSONException e) {
-
-            Log.d(PHP_TAG, "showResult : ", e);
-        }
-
     }
 
 }
