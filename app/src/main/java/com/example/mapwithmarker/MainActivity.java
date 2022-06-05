@@ -603,6 +603,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /*
+        위도, 경도 정보를 가지고 마커를 맵에 추가하고, DB에 기록합니다.
+        맵에서 마커를 찍는 것이 된다면 기타 정보도 입력하기 위해 수정이 필요합니다.
+        (데이터 중복 체크는 아직 미완성 단계, Database.java 쪽에서 다시 건들어봐야 될 것 같습니다)
+     */
     void createNewMarker(double lat, double lng){
         LatLng loc = new LatLng(lat, lng);
         mMarker marker = new mMarker(MainActivity.this, loc, map);
@@ -612,6 +617,9 @@ public class MainActivity extends AppCompatActivity
         marker.focus(15);
     }
 
+    /*
+        DB에 저장된 모든 마커 데이터를 지웁니다. 디버깅용 메소드입니다.
+     */
     void resetAllMarkers(){
         map.clear();
         Database db = new Database(this);
@@ -621,6 +629,10 @@ public class MainActivity extends AppCompatActivity
         //reloadAllMarkers();
     }
 
+    /*
+        앱이 켜질 때, 마커가 추가되거나 삭제될 때 등, DB에서 정보를 불러와 mMarker 객체를 생성하여
+        맵에 추가하는 역할을 합니다.
+     */
     void reloadAllMarkers(){
         //TextView result = new TextView(this);
         Database db = new Database(this);
@@ -644,6 +656,10 @@ public class MainActivity extends AppCompatActivity
         db.close();
     }
 
+    /*
+        메시지 등을 띄울때 일일히 Toast.makeText를 하기 귀찮아서 만들었습니다.
+        showToast("Hello world"); 같은 방식으로 간단하게 토스트 띄울 수 있습니다.
+     */
     void showToast(String msg){
         Toast toast = Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT);
         toast.show();

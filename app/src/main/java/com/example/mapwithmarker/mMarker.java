@@ -23,12 +23,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
  */
 public class mMarker{
 
-    private LatLng latLng;
-    private MainActivity mainActivity;
-    private GoogleMap map;
-    private Database db;
-    private double lat;
-    private double lng;
+    private final LatLng latLng;
+    private final MainActivity mainActivity;
+    private final GoogleMap map;
+    private final double lat;
+    private final double lng;
 
     public mMarker(MainActivity mActivity, LatLng loc, GoogleMap googleMap) {
         mainActivity = mActivity;
@@ -54,9 +53,13 @@ public class mMarker{
 
     }
 
+    /*
+        마커를 DB에 실제로 넣을 때 사용하는 메소드입니다.
+     */
     public boolean addToDatebase(){
-        db = new Database(mainActivity);
+        Database db = new Database(mainActivity);
         Cursor cursor = db.querySQL("SELECT * FROM test1 WHERE lat="+lat+" AND lng="+lng);
+        // 중복 데이터 방지를 위해 조건문을 넣었으나 작동 안됨. 수정 필요
         if (cursor.getCount() == 0){
             db.execSQL(String.format(
                     "INSERT INTO test1 VALUES("+lat+","+lng+");"
