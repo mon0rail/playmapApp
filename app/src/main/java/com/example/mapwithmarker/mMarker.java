@@ -1,6 +1,8 @@
 package com.example.mapwithmarker;
 
 
+import static com.example.mapwithmarker.Database.DB_TABLE_NAME;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -58,11 +60,11 @@ public class mMarker{
      */
     public boolean addToDatebase(){
         Database db = new Database(mainActivity);
-        Cursor cursor = db.querySQL("SELECT * FROM test1 WHERE lat="+lat+" AND lng="+lng);
+        Cursor cursor = db.querySQL("SELECT * FROM "+DB_TABLE_NAME+" WHERE lat="+lat+" AND lng="+lng);
         // 중복 데이터 방지를 위해 조건문을 넣었으나 작동 안됨. 수정 필요
         if (cursor.getCount() == 0){
             db.execSQL(String.format(
-                    "INSERT INTO test1 VALUES("+lat+","+lng+");"
+                    "INSERT INTO "+DB_TABLE_NAME+" VALUES("+lat+","+lng+");"
             ));
             db.close();
             return true;

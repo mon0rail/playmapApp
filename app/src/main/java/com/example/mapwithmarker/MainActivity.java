@@ -37,6 +37,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -227,11 +228,14 @@ public class MainActivity extends AppCompatActivity
          */
         main_pages = new LinearLayout[MAX_PAGES];
         main_pages[0] = (LinearLayout) findViewById(R.id.main_pages_0);
-      //  main_pages[0].addView(View.inflate(this, R.layout.page_0, null));
         main_pages[1] = (LinearLayout) findViewById(R.id.main_pages_1);
         main_pages[1].addView(View.inflate(this, R.layout.page_1, null));
         main_pages[2] = (LinearLayout) findViewById(R.id.main_pages_2);
         main_pages[2].addView(View.inflate(this, R.layout.page_2, null));
+        /* 페이지 추가 코드 (n 대신 숫자)
+        main_pages[n] = (LinearLayout) findViewById(R.id.main_pages_n);
+        main_pages[n].addView(View.inflate(this, R.layout.page_n, null));
+         */
 
         findViewById(R.id.page_2_add_marker).setOnClickListener(mOnclickListener);
         findViewById(R.id.page_2_reload_markers).setOnClickListener(mOnclickListener);
@@ -310,24 +314,29 @@ public class MainActivity extends AppCompatActivity
                     findViewById(R.id.btn_moveTo_page_1).setBackgroundColor(colPrimary);
                     findViewById(R.id.btn_moveTo_page_2).setBackgroundColor(colPrimary);
                     break;
+
                 case R.id.btn_moveTo_page_1:
                     view.setBackgroundColor(colAccent);
                     movePage(currentPage,1);
                     findViewById(R.id.btn_moveTo_page_0).setBackgroundColor(colPrimary);
                     findViewById(R.id.btn_moveTo_page_2).setBackgroundColor(colPrimary);
                     break;
+
                 case R.id.btn_moveTo_page_2:
                     view.setBackgroundColor(colAccent);
                     movePage(currentPage,2);
                     findViewById(R.id.btn_moveTo_page_1).setBackgroundColor(colPrimary);
                     findViewById(R.id.btn_moveTo_page_0).setBackgroundColor(colPrimary);
                     break;
+
                 case R.id.page_2_add_marker:
                     EditText editLat = (EditText)findViewById(R.id.page_2_lat);
                     EditText editLng = (EditText)findViewById(R.id.page_2_lng);
                     String latStr = editLat.getText().toString();
                     String lngStr = editLng.getText().toString();
+
                     if (latStr.length() != 0 && lngStr.length() != 0){
+                        hideSoftKeyboard(MainActivity.this, view);
                         double lat = Double.parseDouble(latStr);
                         double lng = Double.parseDouble(lngStr);
                         createNewMarker(lat, lng);
@@ -335,13 +344,16 @@ public class MainActivity extends AppCompatActivity
                         movePage(2,0);
                         editLat.setText("");
                         editLng.setText("");
+
                     } else {
                         showToast("위도와 경도를 입력해주세요.");
                     }
                     break;
+
                 case R.id.page_2_reload_markers:
                     reloadAllMarkers();
                     break;
+
                 case R.id.page_2_reset_all_markers:
                     resetAllMarkers();
                     break;
@@ -375,6 +387,23 @@ public class MainActivity extends AppCompatActivity
                 main_pages[oldPage].startAnimation(translateRightOut);
                 main_pages[newPage].startAnimation(translateRightIn);
             }
+
+            if (newPage <= 3){
+                findViewById(R.id.btn_moveTo_page_0).setBackgroundColor(colPrimary);
+                findViewById(R.id.btn_moveTo_page_1).setBackgroundColor(colPrimary);
+                findViewById(R.id.btn_moveTo_page_2).setBackgroundColor(colPrimary);
+                switch (newPage){
+                    case 1:
+                        findViewById(R.id.btn_moveTo_page_1).setBackgroundColor(colAccent);
+                        break;
+                    case 2:
+                        findViewById(R.id.btn_moveTo_page_2).setBackgroundColor(colAccent);
+                        break;
+                    default:
+                        findViewById(R.id.btn_moveTo_page_0).setBackgroundColor(colAccent);
+                }
+            }
+
         } else {
             // 페이지 이동이 없으므로 현재 페이지를 그대로 다시 표시시킵니다.
             main_pages[newPage].setVisibility(View.VISIBLE);
@@ -663,6 +692,17 @@ public class MainActivity extends AppCompatActivity
     void showToast(String msg){
         Toast toast = Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT);
         toast.show();
+    }
+
+    /*
+        EditText 입력 후 버튼을 누르면 키보드를 내리는 역할을 합니다.
+        아래처럼 버튼의 리스너에 넣으면 됩니다.
+        hideSoftKeyborad(MainActivity.this, view);
+     */
+    public static void hideSoftKeyboard (Activity activity, View view)
+    {
+        InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
     }
 }
 
