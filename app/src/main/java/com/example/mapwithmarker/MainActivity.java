@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity
     private List[] likelyPlaceAttributions;
     private LatLng[] likelyPlaceLatLngs;
 
-    final int ZOOM_WEIGHT = 8;
+    final int ZOOM_WEIGHT = 6;
     int zoom = ZOOM_WEIGHT+5;
     boolean zoomInControl = false;
 
@@ -221,7 +221,7 @@ public class MainActivity extends AppCompatActivity
         /*
             지도의 최대/최소 줌 레벨을 결정합니다.
          */
-        map.setMinZoomPreference(8);
+        map.setMinZoomPreference(6);
         map.setMaxZoomPreference(20);
 
         onActivityReady();
@@ -274,9 +274,9 @@ public class MainActivity extends AppCompatActivity
         main_pages[n].addView(View.inflate(this, R.layout.page_n, null));
          */
 
-        findViewById(R.id.page_2_add_marker).setOnClickListener(mOnclickListener);
-        findViewById(R.id.page_2_reload_markers).setOnClickListener(mOnclickListener);
-        findViewById(R.id.page_2_reset_all_markers).setOnClickListener(mOnclickListener);
+        findViewById(R.id.page_1_add_marker).setOnClickListener(mOnclickListener);
+        findViewById(R.id.page_1_reload_markers).setOnClickListener(mOnclickListener);
+        findViewById(R.id.page_1_reset_all_markers).setOnClickListener(mOnclickListener);
 
         /*
             페이지 전환 애니메이션 로드 & 리스너 등록입니다. 아래 링크를 참고하였습니다.
@@ -371,13 +371,40 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+        map.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            @Override
+            public void onCameraIdle() {
+                if(zoomInControl) zoomInControl = false;
+            }
+        });
         map.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
             @Override
             public boolean onMyLocationButtonClick() {
                 int newZoom = 13;
                 map.moveCamera(CameraUpdateFactory.zoomTo(newZoom));
                 seekBarMap.setProgress(newZoom-ZOOM_WEIGHT);
+                zoomInControl = true;
                 return false;
+            }
+        });
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener(){
+            @Override
+            public void onMapClick(LatLng point) {
+                MarkerOptions mOptions = new MarkerOptions();
+                // 마커 타이틀
+                mOptions.title("마커 좌표");
+                Double latitude = point.latitude; // 위도
+                EditText setlat = (EditText) findViewById(R.id.page_1_lat);
+                Double longitude = point.longitude; // 경도
+                EditText setlng = (EditText) findViewById(R.id.page_1_lng);
+                setlat.setText(latitude.toString());
+                setlng.setText(longitude.toString());
+                // 마커의 스니펫(간단한 텍스트) 설정
+                mOptions.snippet(latitude.toString() + ", " + longitude.toString());
+                // LatLng: 위도 경도 쌍을 나타냄
+                mOptions.position(new LatLng(latitude, longitude));
+                // 마커(핀) 추가
+                //googleMap.addMarker(mOptions);
             }
         });
 
@@ -410,9 +437,9 @@ public class MainActivity extends AppCompatActivity
                     findViewById(R.id.btn_moveTo_page_0).setBackgroundColor(colPrimary);
                     break;
 
-                case R.id.page_2_add_marker:
-                    EditText editLat = (EditText)findViewById(R.id.page_2_lat);
-                    EditText editLng = (EditText)findViewById(R.id.page_2_lng);
+                case R.id.page_1_add_marker:
+                    EditText editLat = (EditText)findViewById(R.id.page_1_lat);
+                    EditText editLng = (EditText)findViewById(R.id.page_1_lng);
                     String latStr = editLat.getText().toString();
                     String lngStr = editLng.getText().toString();
 
@@ -431,11 +458,11 @@ public class MainActivity extends AppCompatActivity
                     }
                     break;
 
-                case R.id.page_2_reload_markers:
+                case R.id.page_1_reload_markers:
                     reloadAllMarkers();
                     break;
 
-                case R.id.page_2_reset_all_markers:
+                case R.id.page_1_reset_all_markers:
                     resetAllMarkers();
                     break;
             }
