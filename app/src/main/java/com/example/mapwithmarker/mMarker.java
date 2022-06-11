@@ -4,12 +4,18 @@ package com.example.mapwithmarker;
 import static com.example.mapwithmarker.Database.DB_TABLE_NAME;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -17,7 +23,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.w3c.dom.Text;
 
 /*
     처음에는 Marker를 상속하여 만들고자 했으나, Marker가 final이라서 상속이 불가능했습니다.
@@ -48,10 +57,29 @@ public class mMarker{
      */
     private void addToMap(){
         map.addMarker(new MarkerOptions()
-                .position(latLng)
-                .title("Custom marker")
-                .snippet("위도:"+lat+", 경도:"+lng)
-                .icon(bitmapDescriptorFromVector(mainActivity, R.drawable.icon_marker_1)));
+                            .position(latLng)
+                            .title("Custom marker")
+                            .snippet("위도:"+lat+", 경도:"+lng)
+                            .icon(bitmapDescriptorFromVector(mainActivity, R.drawable.icon_marker_1)));
+
+        /*
+        Button btn = layout.findViewById(R.id.btn_share_marker_popup);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent Sharing_intent = new Intent(Intent.ACTION_SEND);
+                Sharing_intent.setType("text/plain");
+
+                String Test_Message = "마커 좌표:"+lat+", "+lng;
+
+                Sharing_intent.putExtra(Intent.EXTRA_TEXT, Test_Message);
+
+                Intent Sharing = Intent.createChooser(Sharing_intent, "공유하기");
+                mainActivity.startActivity(Sharing);
+            }
+        });
+
+         */
 
     }
 
@@ -94,4 +122,5 @@ public class mMarker{
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
+
 }

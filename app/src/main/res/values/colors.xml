@@ -18,6 +18,11 @@
 <resources>
     <color name="colorPrimary">#2CA9FF</color>
     <color name="colorPrimaryDark">#2CA9FF</color>
+    <color name="colorSecondary">#B2CCFF</color>
     <color name="colorAccent">#2C98F0</color>
     <color name="navigationBarColor">#2C98F0</color>
+    <color name="white">#FFFFFF</color>
+    <color name="gray">#AAAAAA</color>
+    <color name="darkGray">#555555</color>
+    <color name="black">#000000</color>
 </resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval"
+    android:useLevel="false">
+
+    <solid
+        android:color="#D9E5FF"/>
+
+    <stroke
+        android:width="2dp"
+        android:color="@color/colorPrimary"/>
+
+    <size
+        android:width="13dp"
+        android:height="13dp"/>
+
+</shape>
+
+    <!--출처: https://ghj1001020.tistory.com/19-->

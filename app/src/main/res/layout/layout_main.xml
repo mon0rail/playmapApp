@@ -5,7 +5,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity">
-
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn1"
+        android:text="공유하기">
+    </Button>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -18,11 +23,39 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <fragment
-                android:id="@+id/map"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent">
+                <fragment
+                    android:id="@+id/map"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+                <SeekBar
+                    android:id="@+id/seekbar_map"
+                    android:layout_width="275dp"
+                    android:layout_height="150dp"
+                    android:translationX="-125dp"
+                    android:max="12"
+                    android:progress="5"
+                    android:rotation="270"
+                    android:layout_marginTop="125dp"
+                    android:splitTrack="true"
+                    android:progressDrawable="@drawable/seekbar"
+                    android:thumb="@drawable/seekbar_thumb"/>
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/new_button"
+                    android:layout_gravity="end|bottom"
+                    android:elevation="10dp"
+                    android:background="@android:color/transparent"
+                    android:paddingBottom="20dp"
+                    android:scaleType="centerInside"/>
+                <!-- android:background="@android:color/transparent" -->
+            </FrameLayout>
 
         </LinearLayout>
 

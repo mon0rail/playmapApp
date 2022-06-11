@@ -16,7 +16,7 @@ package com.example.mapwithmarker;
 
 import static com.example.mapwithmarker.Database.DB_TABLE_NAME;
 import static com.google.android.gms.maps.UiSettings.*;
-
+import android.content.Intent;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -31,6 +31,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Layout;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -42,6 +43,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -121,14 +123,19 @@ public class MainActivity extends AppCompatActivity
     private List[] likelyPlaceAttributions;
     private LatLng[] likelyPlaceLatLngs;
 
+    final int ZOOM_WEIGHT = 8;
+    int zoom = ZOOM_WEIGHT+5;
+    boolean zoomInControl = false;
+
 
     //Server server;
     //final String PHP_SERVER_URL = "http://121.124.124.95/PHP_connection.php";
 
-
+    Button btn1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         /*
             내비게이션 색상 변경 (build.gradle (:app)에서 최소 api 레벨을 21이상으로 바꿔야함)
             아래 링크를 참조하였습니다.
@@ -154,6 +161,23 @@ public class MainActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        btn1 = findViewById(R.id.btn1);
+
+        btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent Sharing_intent = new Intent(Intent.ACTION_SEND);
+                Sharing_intent.setType("text/plain");
+
+                String Test_Message = "공유할 Text";
+
+                Sharing_intent.putExtra(Intent.EXTRA_TEXT, Test_Message);
+
+                Intent Sharing = Intent.createChooser(Sharing_intent, "공유하기");
+                startActivity(Sharing);
+            }
+        });
+
     }
 
     /**
@@ -175,9 +199,11 @@ public class MainActivity extends AppCompatActivity
         /*
             확대&축소 버튼 추가. 아래 링크를 참조하였습니다.
             https://developers.google.com/maps/documentation/android-sdk/controls?hl=ko#zoom_controls
-         */
+
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
+
+         */
 
         /*
             커스텀 마커입니다. mMarker 클래스를 따로 만들어 위치만 지정해주면 마커를 알아서 생성해줍니다.
@@ -186,6 +212,17 @@ public class MainActivity extends AppCompatActivity
         LatLng loc = new LatLng(36.99502, 127.13327);
         //mMarker marker = new mMarker(MainActivity.this, loc, googleMap);
         //marker.focus(18);
+
+        /*
+            커스텀 마커 클릭 시 뜨는 메시지의 어댑터를 설정합니다.
+         */
+        map.setInfoWindowAdapter(new mInfoWindowAdapter(MainActivity.this));
+
+        /*
+            지도의 최대/최소 줌 레벨을 결정합니다.
+         */
+        map.setMinZoomPreference(8);
+        map.setMaxZoomPreference(20);
 
         onActivityReady();
 
@@ -297,6 +334,50 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onAnimationRepeat(Animation animation) {
 
+            }
+        });
+
+        /*
+            간편하게 확대/축소가 가능한 시크바 리스너를 등록하여 카메라를 변경시킵니ㅏㄷ.
+         */
+        SeekBar seekBarMap = findViewById(R.id.seekbar_map);
+        seekBarMap.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                zoom = ZOOM_WEIGHT+i;
+                map.moveCamera(CameraUpdateFactory.zoomTo(zoom));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                zoomInControl = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                zoomInControl = false;
+            }
+        });
+        /*
+            카메라 이동 시 시크바도 함께 이동시킵니다.
+            https://stackoverflow.com/questions/2013443/on-zoom-event-for-google-maps-on-android
+         */
+        map.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+            @Override
+            public void onCameraMove() {
+                if (!zoomInControl){
+                    zoom = (int)map.getCameraPosition().zoom - ZOOM_WEIGHT;
+                    seekBarMap.setProgress(zoom);
+                }
+            }
+        });
+        map.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+            @Override
+            public boolean onMyLocationButtonClick() {
+                int newZoom = 13;
+                map.moveCamera(CameraUpdateFactory.zoomTo(newZoom));
+                seekBarMap.setProgress(newZoom-ZOOM_WEIGHT);
+                return false;
             }
         });
 
