@@ -30,6 +30,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+
 /*
     처음에는 Marker를 상속하여 만들고자 했으나, Marker가 final이라서 상속이 불가능했습니다.
     그래서 mMarker는 실질적으로 마커 객체가 되는 것은 아니지만, 마커를 대신 관리해주는 클래스라고 볼 수 있습니다.
@@ -45,6 +47,8 @@ public class mMarker{
     private String description;
     Marker marker = null;
 
+    static ArrayList<mMarker> MARKER_LIST = new ArrayList<>();
+
     public mMarker(MainActivity mActivity, LatLng loc, GoogleMap googleMap) {
         mainActivity = mActivity;
         name = mainActivity.getString(R.string.marker_name_empty);
@@ -55,7 +59,9 @@ public class mMarker{
 
         map = googleMap;
         //this.addToMap(false);
+        MARKER_LIST.add(this);
     }
+
 
     public void setName(String name){
         this.name = name;
@@ -92,18 +98,19 @@ public class mMarker{
     public void addToMap(boolean showInfoWindow){
         if (marker != null) {
             marker.remove();
-            marker = null;
-        } else {
-            marker = map.addMarker(new MarkerOptions()
-                    .position(latLng)
-                    .title(name)
-                    .snippet(description)
-                    .icon(bitmapDescriptorFromVector(mainActivity, R.drawable.icon_marker_1)));
-            if (showInfoWindow) {
-                assert marker != null;
-                marker.showInfoWindow();
-            }
         }
+        marker = map.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title(name)
+                .snippet(description)
+                .icon(bitmapDescriptorFromVector(mainActivity, R.drawable.icon_marker_1)));
+        if (showInfoWindow) {
+            assert marker != null;
+            marker.showInfoWindow();
+        }
+
+
+
 
         /*
         Button btn = layout.findViewById(R.id.btn_share_marker_popup);
@@ -126,7 +133,8 @@ public class mMarker{
 
     }
     public void refresh(boolean showInfoWindow){
-        addToMap(showInfoWindow);
+        //addToMap(showInfoWindow);
+        addToDatebase();
     }
 
     /*
@@ -134,18 +142,85 @@ public class mMarker{
      */
     public boolean addToDatebase(){
         Database db = new Database(mainActivity);
-        String sql = String.format("SELECT * FROM "+DB_TABLE_NAME+" WHERE lat=%.6f AND lng=%.6f",lat,lng);
-        Cursor cursor = db.querySQL(sql);
 
-        if (cursor.getCount() == 0){
-            sql = "INSERT INTO "+DB_TABLE_NAME+" VALUES("+lat+","+lng+",'"+name+"','"+description+"');";
-            db.execSQL(sql);
-            db.close();
-            return true;
-        } else {
-            db.close();
-            return false;
+        Cursor cursor;
+        String sql, sqlInsert;
+
+        sql = "SELECT * FROM "+DB_TABLE_NAME;
+        cursor = db.querySQL(sql);
+        ArrayList<mMarker> list = new ArrayList<>();
+
+        while (cursor.moveToNext()) {
+            double lat = Double.parseDouble(cursor.getString(0));
+            double lng = Double.parseDouble(cursor.getString(1));
+            if (this.lat != lat && this.lng != lng){
+                String name = cursor.getString(2);
+                String desc = cursor.getString(3);
+                LatLng loc = new LatLng(lat, lng);
+                mMarker m = new mMarker(mainActivity, loc, map);
+                m.setName(name);
+                m.setDescription(desc);
+                list.add(m);
+            }
+            //m.addToMap(false);
         }
+        list.add(mMarker.this);
+
+        db.execSQL("DELETE FROM "+DB_TABLE_NAME);
+
+        for (mMarker m : list){
+            m.addToMap(false);
+            double lat = m.lat;
+            double lng = m.lng;
+            String name = m.name;
+            String description = m.description;
+            sqlInsert = "INSERT INTO "+DB_TABLE_NAME+" VALUES('"+lat+"','"+lng+"','"+name+"','"+description+"');";
+            db.execSQL(sqlInsert);
+        }
+
+        db.close();
+        return true;
+    }
+
+    public void delete(){
+        marker.remove();
+        Database db = new Database(mainActivity);
+
+        Cursor cursor;
+        String sql, sqlInsert;
+
+        sql = "SELECT * FROM "+DB_TABLE_NAME;
+        cursor = db.querySQL(sql);
+        ArrayList<mMarker> list = new ArrayList<>();
+
+        while (cursor.moveToNext()) {
+            double lat = Double.parseDouble(cursor.getString(0));
+            double lng = Double.parseDouble(cursor.getString(1));
+            if (this.lat != lat && this.lng != lng){
+                String name = cursor.getString(2);
+                String desc = cursor.getString(3);
+                LatLng loc = new LatLng(lat, lng);
+                mMarker m = new mMarker(mainActivity, loc, map);
+                m.setName(name);
+                m.setDescription(desc);
+                list.add(m);
+            }
+            //m.addToMap(false);
+        }
+
+        db.execSQL("DELETE FROM "+DB_TABLE_NAME);
+
+        for (mMarker m : list){
+            m.addToMap(false);
+            double lat = m.lat;
+            double lng = m.lng;
+            String name = m.name;
+            String description = m.description;
+            sqlInsert = "INSERT INTO "+DB_TABLE_NAME+" VALUES('"+lat+"','"+lng+"','"+name+"','"+description+"');";
+            db.execSQL(sqlInsert);
+        }
+
+        db.close();
     }
 
     /*
@@ -178,6 +253,19 @@ public class mMarker{
         Canvas canvas = new Canvas(bitmap);
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    static public mMarker findMarkerWithPosition(LatLng loc){
+        if (loc != null) {
+            for (mMarker m : MARKER_LIST){
+                if (m != null &&
+                        m.lat == loc.latitude &&
+                        m.lng == loc.longitude){
+                    return m;
+                }
+            }
+        }
+        return null;
     }
 
 }

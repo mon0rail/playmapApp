@@ -412,8 +412,8 @@ public class MainActivity extends AppCompatActivity
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener(){
             @Override
             public void onMapClick(@NonNull LatLng point) {
-                Double latitude = point.latitude;
-                Double longitude = point.longitude;
+                Double latitude = point.latitude;//Double.parseDouble(String.format("%.6f",point.latitude));
+                Double longitude = point.longitude;//Double.parseDouble(String.format("%.6f",point.longitude));
 
                 BitmapDescriptor bitmap = mMarker.bitmapDescriptorFromVector(MainActivity.this, R.drawable.view_card_marker);
                 selectedMarker = map.addMarker(new MarkerOptions()
@@ -421,11 +421,11 @@ public class MainActivity extends AppCompatActivity
                         //.infoWindowAnchor(.5f, 1.0f)
                         .icon(bitmap)
                         .title(getString(R.string.click_to_add_new_marker))
-                        .snippet(String.format("%3.3f, %3.3f",latitude,longitude))
+                        .snippet(String.format("%.3f, %.3f",latitude,longitude))
                         .position(point));
                 assert selectedMarker != null;
                 selectedMarker.showInfoWindow();
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 15));
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 17));
 
                 EditText editLat = findViewById(R.id.page_1_lat);
                 EditText editLng = findViewById(R.id.page_1_lng);
@@ -532,6 +532,7 @@ public class MainActivity extends AppCompatActivity
                         }
                         double latDouble = Double.parseDouble(lat);
                         double lngDouble = Double.parseDouble(lng);
+                        TextView test = findViewById(R.id.test);
                         if (createNewMarker(latDouble, lngDouble, name, description)){
                             showToast("마커가 추가되었습니다.");
                             movePage(1,0);
@@ -553,7 +554,7 @@ public class MainActivity extends AppCompatActivity
                     resetAllMarkers();
                     break;
 
-                    /*
+
                 case R.id.page_2_save_changes:
                     latEdit = findViewById(R.id.page_2_lat);
                     lngEdit = findViewById(R.id.page_2_lng);
@@ -575,8 +576,9 @@ public class MainActivity extends AppCompatActivity
                         hideSoftKeyboard(MainActivity.this, view);
                         double latDouble = Double.parseDouble(lat);
                         double lngDouble = Double.parseDouble(lng);
-                        if (editMarker(latDouble, lngDouble, name, description)){
-                            reloadAllMarkers();
+                        LatLng loc = new LatLng(latDouble, lngDouble);
+                        if (editMarker(loc, name, description)){
+                            //reloadAllMarkers();
                             movePage(1,0);
                             latEdit.setText("");
                             lngEdit.setText("");
@@ -586,8 +588,53 @@ public class MainActivity extends AppCompatActivity
                             showToast("마커 수정에 실패했습니다.");
                         }
                     }
+                    break;
 
-                     */
+                case R.id.page_2_delete_marker:
+                    latEdit = findViewById(R.id.page_2_lat);
+                    lngEdit = findViewById(R.id.page_2_lng);
+                    lat = latEdit.getText().toString();
+                    lng = lngEdit.getText().toString();
+
+                    if (lat.length() == 0 || lng.length() == 0){
+                        showToast("지도에서 마커를 선택해주세요.");
+                    } else {
+                        hideSoftKeyboard(MainActivity.this, view);
+                        double latDouble = Double.parseDouble(lat);
+                        double lngDouble = Double.parseDouble(lng);
+                        LatLng loc = new LatLng(latDouble, lngDouble);
+                        mMarker marker = com.example.mapwithmarker.mMarker.findMarkerWithPosition(loc);
+                        marker.delete();
+                        showToast("마커를 삭제하였습니다.");
+                        movePage(2,0);
+                    }
+
+                break;
+
+                case R.id.page_2_share_marker:
+                    latEdit = findViewById(R.id.page_2_lat);
+                    lngEdit = findViewById(R.id.page_2_lng);
+                    nameEdit = findViewById(R.id.page_2_name);
+                    descriptionEdit = findViewById(R.id.page_2_description);
+                    lat = latEdit.getText().toString();
+                    lng = lngEdit.getText().toString();
+                    name = nameEdit.getText().toString();
+                    description = descriptionEdit.getText().toString();
+
+                    if (lat.length() == 0 || lng.length() == 0){
+                        showToast("지도에서 마커를 선택해주세요.");
+                    } else {
+                        Intent Sharing_intent = new Intent(Intent.ACTION_SEND);
+                        Sharing_intent.setType("text/plain");
+
+                        String messageToShare = "마커 공유 테스트\n이름: "+name+"\n설명: "+description+"\n위도: "+lat+"\n경도: "+lng+"\ntodo: 공유 메시지 수정, 위도경도 대신 주소 출력 or 길찾기 하이퍼링크로 연결";
+
+                        Sharing_intent.putExtra(Intent.EXTRA_TEXT, messageToShare);
+
+                        Intent Sharing = Intent.createChooser(Sharing_intent, "공유하기");
+                        startActivity(Sharing);
+                    }
+                    break;
 
             }
         }
@@ -920,6 +967,7 @@ public class MainActivity extends AppCompatActivity
                 desc = cursor.getString(3);
                 loc = new LatLng(lat,lng);
                 test.append(String.format("\nlat: %f, lng: %f, name: %s, desc: %s",lat,lng,name,desc));
+                test.append(cursor.getString(0)+", "+cursor.getString(1));
                 marker = new mMarker(MainActivity.this, loc, map);
                 marker.setName(name);
                 marker.setDescription(desc);
@@ -932,15 +980,31 @@ public class MainActivity extends AppCompatActivity
         db.close();
     }
 
-    boolean editMarker(@NonNull double lat, @NonNull double lng, String name, String description){
-        Database db = new Database(getApplicationContext());
-        String sql = String.format("SELECT * FROM "+DB_TABLE_NAME+" WHERE lat=%.6f AND lng=%.6f",lat,lng);
-        Cursor cursor = db.querySQL(sql);
+    @Deprecated
+    boolean editMarker(Marker m, String name, String description){
 
-        if (cursor.getCount() != 0){
-            sql = String.format("UPDATE "+DB_TABLE_NAME+" SET name='%s', description='%s' WHERE lat=%.6f AND lng=%.6f",name, description, lat, lng);
-            db.execSQL(sql);
-            db.close();
+        LatLng loc = m.getPosition();
+        mMarker marker = com.example.mapwithmarker.mMarker.findMarkerWithPosition(loc);
+
+        if (marker != null){
+            marker.setName(name);
+            marker.setDescription(description);
+            marker.refresh(false);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+    boolean editMarker(LatLng loc, String name, String description){
+
+        mMarker marker = com.example.mapwithmarker.mMarker.findMarkerWithPosition(loc);
+
+        if (marker != null){
+            marker.setName(name);
+            marker.setDescription(description);
+            marker.refresh(false);
+
             return true;
         } else {
             return false;
@@ -966,6 +1030,7 @@ public class MainActivity extends AppCompatActivity
         InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
     }
+
 }
 
 

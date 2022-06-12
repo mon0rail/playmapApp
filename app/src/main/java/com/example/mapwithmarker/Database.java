@@ -9,8 +9,8 @@ import androidx.annotation.Nullable;
 
 public class Database extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 3;
-    private static final String DB_NAME = "playMap3v.db";
+    private static final int DB_VERSION = 10;
+    private static final String DB_NAME = "playMap10v.db";
     public static final String DB_TABLE_NAME = "markers";
     SQLiteDatabase db;
 
@@ -21,8 +21,8 @@ public class Database extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("CREATE TABLE "+DB_TABLE_NAME+" ("
-                +"lat decimal(19,5) not null,"
-                +"lng decimal(19,5) not null,"
+                +"lat varchar(20) not null,"
+                +"lng varchar(20) not null,"
                 +"name varchar(20),"
                 +"description varchar(200),"
                 +"primary key(lat,lng)"
