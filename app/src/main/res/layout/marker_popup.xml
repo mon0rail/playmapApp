@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         style="@style/txtTitle"/>
 
-    <TextView android:id="@+id/txt_latLng_markerPopup"
+    <TextView android:id="@+id/txt_description_markerPopup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/txtNormal"/>

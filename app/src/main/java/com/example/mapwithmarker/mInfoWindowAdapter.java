@@ -1,6 +1,7 @@
 package com.example.mapwithmarker;
 
 
+import android.annotation.SuppressLint;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -27,6 +28,7 @@ public class mInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         return null;
     }
 
+    @SuppressLint("DefaultLocale")
     @Nullable
     @Override
     public View getInfoWindow(@NonNull Marker marker) {
@@ -34,16 +36,18 @@ public class mInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         double lng = marker.getPosition().longitude;
 
         LinearLayout layout = (LinearLayout) View.inflate(mainActivity, R.layout.marker_popup, null);
-        TextView latLngView = layout.findViewById(R.id.txt_latLng_markerPopup);
-        String latLng = "위도:"+lat+",\n경도:"+lng;
-        latLngView.setText(latLng);
 
-        /*
-        TextView titleView = layout.findViewById(R.id.txt_title_markerPopup);
-        String title = "마커 이름";
-        titleView.setText(title);
+        TextView descText = layout.findViewById(R.id.txt_description_markerPopup);
+        String snippet = marker.getSnippet();
+        if (snippet != null && snippet.contains("SHARABLE")){
+            descText.setText("클릭하여 마커 공유하기");
+        } else {
+            descText.setText(String.format("%3.3f, %3.3f",lat,lng));
+        }
 
-         */
+        TextView titleText = layout.findViewById(R.id.txt_title_markerPopup);
+        String name = marker.getTitle();
+        titleText.setText(name);
 
         return layout;
     }

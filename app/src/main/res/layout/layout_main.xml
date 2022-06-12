@@ -5,12 +5,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity">
+    <!--
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btn1"
         android:text="공유하기">
     </Button>
+    -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -45,6 +47,7 @@
                     android:progressDrawable="@drawable/seekbar"
                     android:thumb="@drawable/seekbar_thumb"/>
 
+                <!--
                 <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -54,7 +57,7 @@
                     android:background="@android:color/transparent"
                     android:paddingBottom="20dp"
                     android:scaleType="centerInside"/>
-                <!-- android:background="@android:color/transparent" -->
+                  -->
             </FrameLayout>
 
         </LinearLayout>

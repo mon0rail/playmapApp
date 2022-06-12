@@ -16,6 +16,8 @@ package com.example.mapwithmarker;
 
 import static com.example.mapwithmarker.Database.DB_TABLE_NAME;
 import static com.google.android.gms.maps.UiSettings.*;
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -127,6 +129,8 @@ public class MainActivity extends AppCompatActivity
     int zoom = ZOOM_WEIGHT+5;
     boolean zoomInControl = false;
 
+    Marker selectedMarker;
+
 
     //Server server;
     //final String PHP_SERVER_URL = "http://121.124.124.95/PHP_connection.php";
@@ -161,8 +165,8 @@ public class MainActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        /*
         btn1 = findViewById(R.id.btn1);
-
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,6 +181,8 @@ public class MainActivity extends AppCompatActivity
                 startActivity(Sharing);
             }
         });
+
+         */
 
     }
 
@@ -242,6 +248,7 @@ public class MainActivity extends AppCompatActivity
         이것이 따로 메소드로 만들어져 onMapReady에 있는 이유는, mapFragment.getMapAsync와 함께 실행하면
         충돌이 발생하기 때문입니다.
      */
+    @SuppressLint("PotentialBehaviorOverride")
     private void onActivityReady() {
 
         /*
@@ -389,30 +396,68 @@ public class MainActivity extends AppCompatActivity
         });
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener(){
             @Override
-            public void onMapClick(LatLng point) {
-                MarkerOptions mOptions = new MarkerOptions();
-                // 마커 타이틀
-                mOptions.title("마커 좌표");
-                Double latitude = point.latitude; // 위도
-                EditText setlat = (EditText) findViewById(R.id.page_1_lat);
-                Double longitude = point.longitude; // 경도
-                EditText setlng = (EditText) findViewById(R.id.page_1_lng);
-                setlat.setText(latitude.toString());
-                setlng.setText(longitude.toString());
-                // 마커의 스니펫(간단한 텍스트) 설정
-                mOptions.snippet(latitude.toString() + ", " + longitude.toString());
-                // LatLng: 위도 경도 쌍을 나타냄
-                mOptions.position(new LatLng(latitude, longitude));
-                // 마커(핀) 추가
-                //googleMap.addMarker(mOptions);
+            public void onMapClick(@NonNull LatLng point) {
+                Double latitude = point.latitude;
+                Double longitude = point.longitude;
+
+                BitmapDescriptor bitmap = mMarker.bitmapDescriptorFromVector(MainActivity.this, R.drawable.view_card_marker);
+                selectedMarker = map.addMarker(new MarkerOptions()
+                        //.alpha(0.0f)
+                        //.infoWindowAnchor(.5f, 1.0f)
+                        .icon(bitmap)
+                        .title(getString(R.string.click_to_add_new_marker))
+                        .snippet("")
+                        .position(point));
+                assert selectedMarker != null;
+                selectedMarker.showInfoWindow();
+
+                EditText editLat = findViewById(R.id.page_1_lat);
+                EditText editLng = findViewById(R.id.page_1_lng);
+                editLat.setText(String.valueOf(latitude));
+                editLng.setText(String.valueOf(longitude));
             }
         });
+        map.setOnInfoWindowCloseListener(new GoogleMap.OnInfoWindowCloseListener() {
+            @Override
+            public void onInfoWindowClose(@NonNull Marker marker) {
+                if (selectedMarker != null){
+                    selectedMarker.remove();
+                    selectedMarker = null;
+                }
+            }
+        });
+        map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(@NonNull Marker marker) {
+                if (mMarker.isSamePosition(marker, selectedMarker)){
+                    movePage(0,1);
+                } else {
+                    String snippet = marker.getSnippet();
+                    if (snippet != null && snippet.contains("SHARABLE")){
+                        double lat = marker.getPosition().latitude;
+                        double lng = marker.getPosition().longitude;
+                        Intent Sharing_intent = new Intent(Intent.ACTION_SEND);
+                        Sharing_intent.setType("text/plain");
+
+                        String Test_Message = "마커 공유 테스트\n위도: "+lat+",\n경도:"+lng;
+
+                        Sharing_intent.putExtra(Intent.EXTRA_TEXT, Test_Message);
+
+                        Intent Sharing = Intent.createChooser(Sharing_intent, "공유하기");
+                        startActivity(Sharing);
+                    }
+                }
+
+            }
+        });
+
 
         reloadAllMarkers();
 
     }
 
     View.OnClickListener mOnclickListener = new View.OnClickListener() {
+        @SuppressLint("NonConstantResourceId")
         @Override
         public void onClick(View view) {
             switch (view.getId()){
@@ -747,7 +792,7 @@ public class MainActivity extends AppCompatActivity
      */
     void createNewMarker(double lat, double lng){
         LatLng loc = new LatLng(lat, lng);
-        mMarker marker = new mMarker(MainActivity.this, loc, map);
+        mMarker marker = new mMarker(MainActivity.this, loc, map, true, true);
         if (!marker.addToDatebase()){
             showToast("중복되는 데이터가 이미 DB에 존재합니다");
         }
@@ -784,7 +829,7 @@ public class MainActivity extends AppCompatActivity
                 lat = Double.parseDouble(cursor.getString(0));
                 lng = Double.parseDouble(cursor.getString(1));
                 loc = new LatLng(lat,lng);
-                marker = new mMarker(MainActivity.this, loc, map);
+                marker = new mMarker(MainActivity.this, loc, map, true, false);
                 marker.addToDatebase();
             }
         }

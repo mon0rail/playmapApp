@@ -40,6 +40,7 @@ public class mMarker{
     private final double lat;
     private final double lng;
 
+    @Deprecated
     public mMarker(MainActivity mActivity, LatLng loc, GoogleMap googleMap) {
         mainActivity = mActivity;
         latLng = loc;
@@ -47,20 +48,43 @@ public class mMarker{
         lng = latLng.longitude;
 
         map = googleMap;
-        this.addToMap();
-        //this.addToDatebase();
+        this.addToMap(false);
+    }
+
+    public mMarker(MainActivity mActivity, LatLng loc, GoogleMap googleMap, boolean addToMap, boolean showInfoWindow) {
+        mainActivity = mActivity;
+        latLng = loc;
+        lat = latLng.latitude;
+        lng = latLng.longitude;
+
+        map = googleMap;
+        if (addToMap) this.addToMap(showInfoWindow);
+    }
+
+    static public boolean isSamePosition(LatLng loc1, LatLng loc2) {
+
+        if (loc1 != null && loc2 != null) {
+            double lat1 = loc1.latitude;
+            double lng1 = loc1.longitude;
+            double lat2 = loc2.latitude;
+            double lng2 = loc2.longitude;
+            return lat1 == lat2 && lng1 == lng2;
+        }
+        return false;
     }
 
     /*
         이 메소드는 처음 계획시 add(googleMap)으로 하려고 하였으나,
         내부 메소드로 바꿔 객체 생성 시 자동으로 구글맵에 마커를 추가시켜주도록 하였습니다.
      */
-    private void addToMap(){
-        map.addMarker(new MarkerOptions()
+    private void addToMap(boolean showInfoWindow){
+        Marker marker = map.addMarker(new MarkerOptions()
                             .position(latLng)
                             .title("Custom marker")
-                            .snippet("위도:"+lat+", 경도:"+lng)
+                            .snippet("SHARABLE")
                             .icon(bitmapDescriptorFromVector(mainActivity, R.drawable.icon_marker_1)));
+        assert marker != null;
+        if(showInfoWindow) marker.showInfoWindow();
 
         /*
         Button btn = layout.findViewById(R.id.btn_share_marker_popup);
@@ -114,7 +138,17 @@ public class mMarker{
         벡터 이미지를 마커 아이콘에 적용하기 위해 가져온 메소드입니다.
         https://stackoverflow.com/questions/42365658/custom-marker-in-google-maps-in-android-with-vector-asset-icon
      */
-    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+
+    static public boolean isSamePosition(Marker marker1, Marker marker2) {
+
+        if (marker1 != null && marker2 != null) {
+            LatLng loc1 = marker1.getPosition();
+            LatLng loc2 = marker2.getPosition();
+            return isSamePosition(loc1, loc2);
+        }
+        return false;
+    }
+    static public BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
         Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
         vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);

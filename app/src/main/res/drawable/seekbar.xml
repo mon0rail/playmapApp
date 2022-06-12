@@ -4,7 +4,7 @@
         <shape android:shape="line">
             <stroke
                 android:width="6dp"
-                android:color="@color/white"/>
+                android:color="@color/lightGray"/>
         </shape>
     </item>
 
@@ -23,7 +23,7 @@
             <shape android:shape="line">
                 <stroke
                     android:width="6dp"
-                    android:color="#6799FF" />
+                    android:color="@color/colorPrimary" />
             </shape>
         </clip>
     </item>
