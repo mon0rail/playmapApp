@@ -82,12 +82,12 @@
 
 
     <!-- 하단바 -->
+    <!--
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="bottom">
 
-        <!-- (좌)()() -->
         <LinearLayout
             android:id="@+id/btn_moveTo_page_0"
             android:layout_width="wrap_content"
@@ -113,7 +113,6 @@
                 android:textColor="#fff" />
         </LinearLayout>
 
-        <!-- ()(중)() -->
         <LinearLayout
             android:id="@+id/btn_moveTo_page_1"
             android:layout_width="wrap_content"
@@ -139,7 +138,6 @@
                 android:textColor="#fff" />
         </LinearLayout>
 
-        <!-- ()()(우) -->
         <LinearLayout
             android:id="@+id/btn_moveTo_page_2"
             android:layout_width="wrap_content"
@@ -166,6 +164,6 @@
         </LinearLayout>
 
     </LinearLayout>
-
+    -->
 
 </LinearLayout>

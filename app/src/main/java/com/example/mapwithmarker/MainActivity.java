@@ -256,9 +256,6 @@ public class MainActivity extends AppCompatActivity
             원래는 FrameLayout에 버튼과 이미지+텍스트를 표시하는 레이아웃을 중첩시켰지만,
             Button 대신 LinearLayout에서 clickable 속성을 true로 해준 뒤, 클릭 리스너를 등록시켰습니다.
          */
-        findViewById(R.id.btn_moveTo_page_0).setOnClickListener(mOnclickListener);
-        findViewById(R.id.btn_moveTo_page_1).setOnClickListener(mOnclickListener);
-        findViewById(R.id.btn_moveTo_page_2).setOnClickListener(mOnclickListener);
 
         colPrimary = ContextCompat.getColor(MainActivity.this, R.color.colorPrimary);
         colAccent = ContextCompat.getColor(MainActivity.this, R.color.colorAccent);
@@ -484,27 +481,9 @@ public class MainActivity extends AppCompatActivity
             String lat, lng, name, description;
 
             switch (view.getId()){
-                case R.id.btn_moveTo_page_0:
-                    view.setBackgroundColor(colAccent);
                 case R.id.page_1_back_to_main:
                 case R.id.page_2_back_to_main:
                     movePage(currentPage,0);
-                    findViewById(R.id.btn_moveTo_page_1).setBackgroundColor(colPrimary);
-                    findViewById(R.id.btn_moveTo_page_2).setBackgroundColor(colPrimary);
-                    break;
-
-                case R.id.btn_moveTo_page_1:
-                    view.setBackgroundColor(colAccent);
-                    movePage(currentPage,1);
-                    findViewById(R.id.btn_moveTo_page_0).setBackgroundColor(colPrimary);
-                    findViewById(R.id.btn_moveTo_page_2).setBackgroundColor(colPrimary);
-                    break;
-
-                case R.id.btn_moveTo_page_2:
-                    view.setBackgroundColor(colAccent);
-                    movePage(currentPage,2);
-                    findViewById(R.id.btn_moveTo_page_1).setBackgroundColor(colPrimary);
-                    findViewById(R.id.btn_moveTo_page_0).setBackgroundColor(colPrimary);
                     break;
 
                 case R.id.page_1_add_marker:
@@ -665,22 +644,6 @@ public class MainActivity extends AppCompatActivity
             } else {
                 main_pages[oldPage].startAnimation(translateRightOut);
                 main_pages[newPage].startAnimation(translateRightIn);
-            }
-
-            if (newPage <= 3){
-                findViewById(R.id.btn_moveTo_page_0).setBackgroundColor(colPrimary);
-                findViewById(R.id.btn_moveTo_page_1).setBackgroundColor(colPrimary);
-                findViewById(R.id.btn_moveTo_page_2).setBackgroundColor(colPrimary);
-                switch (newPage){
-                    case 1:
-                        findViewById(R.id.btn_moveTo_page_1).setBackgroundColor(colAccent);
-                        break;
-                    case 2:
-                        findViewById(R.id.btn_moveTo_page_2).setBackgroundColor(colAccent);
-                        break;
-                    default:
-                        findViewById(R.id.btn_moveTo_page_0).setBackgroundColor(colAccent);
-                }
             }
 
         } else {
