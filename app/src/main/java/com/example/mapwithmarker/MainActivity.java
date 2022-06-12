@@ -44,6 +44,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -125,8 +126,8 @@ public class MainActivity extends AppCompatActivity
     private List[] likelyPlaceAttributions;
     private LatLng[] likelyPlaceLatLngs;
 
-    final int ZOOM_WEIGHT = 6;
-    int zoom = ZOOM_WEIGHT+5;
+    final float ZOOM_WEIGHT = 6.0f;
+    float zoom = ZOOM_WEIGHT + 5.0f;
     boolean zoomInControl = false;
 
     Marker selectedMarker;
@@ -258,10 +259,11 @@ public class MainActivity extends AppCompatActivity
         findViewById(R.id.btn_moveTo_page_0).setOnClickListener(mOnclickListener);
         findViewById(R.id.btn_moveTo_page_1).setOnClickListener(mOnclickListener);
         findViewById(R.id.btn_moveTo_page_2).setOnClickListener(mOnclickListener);
-        //findViewById(R.id.btn_getServerData).setOnClickListener(mOnclickListener);
 
         colPrimary = ContextCompat.getColor(MainActivity.this, R.color.colorPrimary);
         colAccent = ContextCompat.getColor(MainActivity.this, R.color.colorAccent);
+
+
 
 
         /*
@@ -284,6 +286,12 @@ public class MainActivity extends AppCompatActivity
         findViewById(R.id.page_1_add_marker).setOnClickListener(mOnclickListener);
         findViewById(R.id.page_1_reload_markers).setOnClickListener(mOnclickListener);
         findViewById(R.id.page_1_reset_all_markers).setOnClickListener(mOnclickListener);
+        findViewById(R.id.page_1_back_to_main).setOnClickListener(mOnclickListener);
+
+        findViewById(R.id.page_2_save_changes).setOnClickListener(mOnclickListener);
+        findViewById(R.id.page_2_share_marker).setOnClickListener(mOnclickListener);
+        findViewById(R.id.page_2_delete_marker).setOnClickListener(mOnclickListener);
+        findViewById(R.id.page_2_back_to_main).setOnClickListener(mOnclickListener);
 
         /*
             페이지 전환 애니메이션 로드 & 리스너 등록입니다. 아래 링크를 참고하였습니다.
@@ -344,6 +352,10 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        ((EditText)findViewById(R.id.page_2_lat)).setEnabled(false);
+        ((EditText)findViewById(R.id.page_2_lng)).setEnabled(false);
+
+
         /*
             간편하게 확대/축소가 가능한 시크바 리스너를 등록하여 카메라를 변경시킵니ㅏㄷ.
          */
@@ -351,8 +363,10 @@ public class MainActivity extends AppCompatActivity
         seekBarMap.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                zoom = ZOOM_WEIGHT+i;
-                map.moveCamera(CameraUpdateFactory.zoomTo(zoom));
+                if (zoomInControl){
+                    zoom = ZOOM_WEIGHT+i/10;
+                    map.moveCamera(CameraUpdateFactory.zoomTo(zoom));
+                }
             }
 
             @Override
@@ -372,12 +386,11 @@ public class MainActivity extends AppCompatActivity
         map.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             @Override
             public void onCameraMove() {
-                if (!zoomInControl){
-                    zoom = (int)map.getCameraPosition().zoom - ZOOM_WEIGHT;
-                    seekBarMap.setProgress(zoom);
-                }
+                zoom = map.getCameraPosition().zoom - ZOOM_WEIGHT;
+                seekBarMap.setProgress((int) zoom*10);
             }
         });
+        /*
         map.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
             public void onCameraIdle() {
@@ -387,13 +400,15 @@ public class MainActivity extends AppCompatActivity
         map.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
             @Override
             public boolean onMyLocationButtonClick() {
-                int newZoom = 13;
+                int newZoom = 15;
                 map.moveCamera(CameraUpdateFactory.zoomTo(newZoom));
                 seekBarMap.setProgress(newZoom-ZOOM_WEIGHT);
                 zoomInControl = true;
                 return false;
             }
         });
+
+         */
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener(){
             @Override
             public void onMapClick(@NonNull LatLng point) {
@@ -406,10 +421,11 @@ public class MainActivity extends AppCompatActivity
                         //.infoWindowAnchor(.5f, 1.0f)
                         .icon(bitmap)
                         .title(getString(R.string.click_to_add_new_marker))
-                        .snippet("")
+                        .snippet(String.format("%3.3f, %3.3f",latitude,longitude))
                         .position(point));
                 assert selectedMarker != null;
                 selectedMarker.showInfoWindow();
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 15));
 
                 EditText editLat = findViewById(R.id.page_1_lat);
                 EditText editLng = findViewById(R.id.page_1_lng);
@@ -432,20 +448,23 @@ public class MainActivity extends AppCompatActivity
                 if (mMarker.isSamePosition(marker, selectedMarker)){
                     movePage(0,1);
                 } else {
-                    String snippet = marker.getSnippet();
-                    if (snippet != null && snippet.contains("SHARABLE")){
-                        double lat = marker.getPosition().latitude;
-                        double lng = marker.getPosition().longitude;
-                        Intent Sharing_intent = new Intent(Intent.ACTION_SEND);
-                        Sharing_intent.setType("text/plain");
+                    double lat = marker.getPosition().latitude;
+                    double lng = marker.getPosition().longitude;
+                    String name = marker.getTitle();
+                    String desc = marker.getSnippet();
 
-                        String Test_Message = "마커 공유 테스트\n위도: "+lat+",\n경도:"+lng;
+                    EditText latEdit = findViewById(R.id.page_2_lat);
+                    EditText lngEdit = findViewById(R.id.page_2_lng);
+                    EditText nameEdit = findViewById(R.id.page_2_name);
+                    EditText descEdit = findViewById(R.id.page_2_description);
 
-                        Sharing_intent.putExtra(Intent.EXTRA_TEXT, Test_Message);
+                    latEdit.setText(String.valueOf(lat));
+                    lngEdit.setText(String.valueOf(lng));
+                    nameEdit.setText(name);
+                    descEdit.setText(desc);
 
-                        Intent Sharing = Intent.createChooser(Sharing_intent, "공유하기");
-                        startActivity(Sharing);
-                    }
+                    movePage(0,2);
+
                 }
 
             }
@@ -456,13 +475,19 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+
     View.OnClickListener mOnclickListener = new View.OnClickListener() {
         @SuppressLint("NonConstantResourceId")
         @Override
         public void onClick(View view) {
+            EditText latEdit, lngEdit, nameEdit, descriptionEdit;
+            String lat, lng, name, description;
+
             switch (view.getId()){
                 case R.id.btn_moveTo_page_0:
                     view.setBackgroundColor(colAccent);
+                case R.id.page_1_back_to_main:
+                case R.id.page_2_back_to_main:
                     movePage(currentPage,0);
                     findViewById(R.id.btn_moveTo_page_1).setBackgroundColor(colPrimary);
                     findViewById(R.id.btn_moveTo_page_2).setBackgroundColor(colPrimary);
@@ -483,23 +508,37 @@ public class MainActivity extends AppCompatActivity
                     break;
 
                 case R.id.page_1_add_marker:
-                    EditText editLat = (EditText)findViewById(R.id.page_1_lat);
-                    EditText editLng = (EditText)findViewById(R.id.page_1_lng);
-                    String latStr = editLat.getText().toString();
-                    String lngStr = editLng.getText().toString();
+                    latEdit = findViewById(R.id.page_1_lat);
+                    lngEdit = findViewById(R.id.page_1_lng);
+                    nameEdit = findViewById(R.id.page_1_name);
+                    descriptionEdit = findViewById(R.id.page_1_description);
+                    lat = latEdit.getText().toString();
+                    lng = lngEdit.getText().toString();
+                    name = nameEdit.getText().toString();
+                    description = descriptionEdit.getText().toString();
 
-                    if (latStr.length() != 0 && lngStr.length() != 0){
-                        hideSoftKeyboard(MainActivity.this, view);
-                        double lat = Double.parseDouble(latStr);
-                        double lng = Double.parseDouble(lngStr);
-                        createNewMarker(lat, lng);
-                        showToast("마커가 추가되었습니다.");
-                        movePage(2,0);
-                        editLat.setText("");
-                        editLng.setText("");
-
-                    } else {
+                    if (lat.length() == 0 || lng.length() == 0){
                         showToast("위도와 경도를 입력해주세요.");
+                    } else if (name.length() == 0){
+                        showToast("마커의 제목을 입력해주세요.");
+                    } else if (name.length() > 20){
+                        showToast("제목의 길이는 최대 20자입니다.");
+                    } else if (description.length() > 200){
+                        showToast("설명의 길이는 최대 200자입니다.");
+                    } else {
+                        hideSoftKeyboard(MainActivity.this, view);
+                        double latDouble = Double.parseDouble(lat);
+                        double lngDouble = Double.parseDouble(lng);
+                        if (createNewMarker(latDouble, lngDouble, name, description)){
+                            showToast("마커가 추가되었습니다.");
+                            movePage(1,0);
+                            latEdit.setText("");
+                            lngEdit.setText("");
+                            nameEdit.setText("");
+                            descriptionEdit.setText("");
+                        } else {
+                            showToast("중복되는 데이터가 이미 존재합니다.");
+                        }
                     }
                     break;
 
@@ -510,6 +549,43 @@ public class MainActivity extends AppCompatActivity
                 case R.id.page_1_reset_all_markers:
                     resetAllMarkers();
                     break;
+
+                    /*
+                case R.id.page_2_save_changes:
+                    latEdit = findViewById(R.id.page_2_lat);
+                    lngEdit = findViewById(R.id.page_2_lng);
+                    nameEdit = findViewById(R.id.page_2_name);
+                    descriptionEdit = findViewById(R.id.page_2_description);
+                    lat = latEdit.getText().toString();
+                    lng = lngEdit.getText().toString();
+                    name = nameEdit.getText().toString();
+                    description = descriptionEdit.getText().toString();
+
+                    if (lat.length() == 0 || lng.length() == 0){
+                        showToast("지도에서 마커를 선택해주세요.");
+                    } else if (name.length() == 0) {
+                        showToast("마커의 제목을 입력해주세요.");
+                    } else {
+                        if (description.length() == 0){
+                            description = "설명이 비어있습니다";
+                        }
+                        hideSoftKeyboard(MainActivity.this, view);
+                        double latDouble = Double.parseDouble(lat);
+                        double lngDouble = Double.parseDouble(lng);
+                        if (editMarker(latDouble, lngDouble, name, description)){
+                            reloadAllMarkers();
+                            movePage(1,0);
+                            latEdit.setText("");
+                            lngEdit.setText("");
+                            nameEdit.setText("");
+                            descriptionEdit.setText("");
+                        } else {
+                            showToast("마커 수정에 실패했습니다.");
+                        }
+                    }
+
+                     */
+
             }
         }
     };
@@ -790,13 +866,19 @@ public class MainActivity extends AppCompatActivity
         맵에서 마커를 찍는 것이 된다면 기타 정보도 입력하기 위해 수정이 필요합니다.
         (데이터 중복 체크는 아직 미완성 단계, Database.java 쪽에서 다시 건들어봐야 될 것 같습니다)
      */
-    void createNewMarker(double lat, double lng){
+    boolean createNewMarker(double lat, double lng, String name, String description){
         LatLng loc = new LatLng(lat, lng);
-        mMarker marker = new mMarker(MainActivity.this, loc, map, true, true);
-        if (!marker.addToDatebase()){
-            showToast("중복되는 데이터가 이미 DB에 존재합니다");
+        mMarker marker = new mMarker(MainActivity.this, loc, map);
+        marker.setName(name);
+        marker.setDescription(description);
+        if (marker.addToDatebase()){
+            marker.addToMap(true);
+            marker.focus(15);
+            return true;
         }
-        marker.focus(15);
+        else {
+            return false;
+        }
     }
 
     /*
@@ -821,21 +903,45 @@ public class MainActivity extends AppCompatActivity
         double lat, lng;
         LatLng loc;
         mMarker marker;
+        String name, desc;
 
         map.clear();
         Cursor cursor = db.querySQL("SELECT * FROM "+DB_TABLE_NAME);
         if (cursor.getCount() != 0){
+            TextView test = findViewById(R.id.test);
+            test.setText("");
             while (cursor.moveToNext()){
                 lat = Double.parseDouble(cursor.getString(0));
                 lng = Double.parseDouble(cursor.getString(1));
+                name = cursor.getString(2);
+                desc = cursor.getString(3);
                 loc = new LatLng(lat,lng);
-                marker = new mMarker(MainActivity.this, loc, map, true, false);
-                marker.addToDatebase();
+                test.append(String.format("\nlat: %f, lng: %f, name: %s, desc: %s",lat,lng,name,desc));
+                marker = new mMarker(MainActivity.this, loc, map);
+                marker.setName(name);
+                marker.setDescription(desc);
+                marker.addToMap(false);
+                //marker.addToDatebase();
             }
         }
         showToast("모든 마커를 불러왔습니다.");
 
         db.close();
+    }
+
+    boolean editMarker(@NonNull double lat, @NonNull double lng, String name, String description){
+        Database db = new Database(getApplicationContext());
+        String sql = String.format("SELECT * FROM "+DB_TABLE_NAME+" WHERE lat=%.6f AND lng=%.6f",lat,lng);
+        Cursor cursor = db.querySQL(sql);
+
+        if (cursor.getCount() != 0){
+            sql = String.format("UPDATE "+DB_TABLE_NAME+" SET name='%s', description='%s' WHERE lat=%.6f AND lng=%.6f",name, description, lat, lng);
+            db.execSQL(sql);
+            db.close();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /*

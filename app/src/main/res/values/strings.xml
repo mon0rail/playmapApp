@@ -26,4 +26,8 @@
     <string name="btn_page_1_name">마커 추가</string>
     <string name="btn_page_2_name">-</string>
     <string name="click_to_add_new_marker">클릭하여 새 마커 만들기</string>
+    <string name="marker_name_empty">이름없는 마커</string>
+    <string name="marker_desc_empty">설명이 비어있습니다</string>
+    <string name="page_1_title">새로운 마커 만들기</string>
+    <string name="page_2_title">마커 수정하기</string>
 </resources>

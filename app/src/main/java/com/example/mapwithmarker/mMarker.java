@@ -3,6 +3,7 @@ package com.example.mapwithmarker;
 
 import static com.example.mapwithmarker.Database.DB_TABLE_NAME;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,26 +41,36 @@ public class mMarker{
     private final GoogleMap map;
     private final double lat;
     private final double lng;
+    private String name;
+    private String description;
+    Marker marker = null;
 
-    @Deprecated
     public mMarker(MainActivity mActivity, LatLng loc, GoogleMap googleMap) {
         mainActivity = mActivity;
+        name = mainActivity.getString(R.string.marker_name_empty);
+        description = mainActivity.getString(R.string.marker_desc_empty);
         latLng = loc;
         lat = latLng.latitude;
         lng = latLng.longitude;
 
         map = googleMap;
-        this.addToMap(false);
+        //this.addToMap(false);
     }
 
-    public mMarker(MainActivity mActivity, LatLng loc, GoogleMap googleMap, boolean addToMap, boolean showInfoWindow) {
-        mainActivity = mActivity;
-        latLng = loc;
-        lat = latLng.latitude;
-        lng = latLng.longitude;
+    public void setName(String name){
+        this.name = name;
+    }
 
-        map = googleMap;
-        if (addToMap) this.addToMap(showInfoWindow);
+    public String getName() {
+        return name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     static public boolean isSamePosition(LatLng loc1, LatLng loc2) {
@@ -74,17 +86,24 @@ public class mMarker{
     }
 
     /*
-        이 메소드는 처음 계획시 add(googleMap)으로 하려고 하였으나,
-        내부 메소드로 바꿔 객체 생성 시 자동으로 구글맵에 마커를 추가시켜주도록 하였습니다.
+        setName(), setDescription() 등을 실행한 뒤에 실행하는 메소드입니다.
+        마커를 맵에 추가하는 역할을 하며, DB에 등록시키려면 addToDatabase()도 같이 실행하면 됩니다.
      */
-    private void addToMap(boolean showInfoWindow){
-        Marker marker = map.addMarker(new MarkerOptions()
-                            .position(latLng)
-                            .title("Custom marker")
-                            .snippet("SHARABLE")
-                            .icon(bitmapDescriptorFromVector(mainActivity, R.drawable.icon_marker_1)));
-        assert marker != null;
-        if(showInfoWindow) marker.showInfoWindow();
+    public void addToMap(boolean showInfoWindow){
+        if (marker != null) {
+            marker.remove();
+            marker = null;
+        } else {
+            marker = map.addMarker(new MarkerOptions()
+                    .position(latLng)
+                    .title(name)
+                    .snippet(description)
+                    .icon(bitmapDescriptorFromVector(mainActivity, R.drawable.icon_marker_1)));
+            if (showInfoWindow) {
+                assert marker != null;
+                marker.showInfoWindow();
+            }
+        }
 
         /*
         Button btn = layout.findViewById(R.id.btn_share_marker_popup);
@@ -106,23 +125,27 @@ public class mMarker{
          */
 
     }
+    public void refresh(boolean showInfoWindow){
+        addToMap(showInfoWindow);
+    }
 
     /*
         마커를 DB에 실제로 넣을 때 사용하는 메소드입니다.
      */
     public boolean addToDatebase(){
         Database db = new Database(mainActivity);
-        Cursor cursor = db.querySQL("SELECT * FROM "+DB_TABLE_NAME+" WHERE lat="+lat+" AND lng="+lng);
-        // 중복 데이터 방지를 위해 조건문을 넣었으나 작동 안됨. 수정 필요
+        String sql = String.format("SELECT * FROM "+DB_TABLE_NAME+" WHERE lat=%.6f AND lng=%.6f",lat,lng);
+        Cursor cursor = db.querySQL(sql);
+
         if (cursor.getCount() == 0){
-            db.execSQL(String.format(
-                    "INSERT INTO "+DB_TABLE_NAME+" VALUES("+lat+","+lng+");"
-            ));
+            sql = "INSERT INTO "+DB_TABLE_NAME+" VALUES("+lat+","+lng+",'"+name+"','"+description+"');";
+            db.execSQL(sql);
             db.close();
             return true;
+        } else {
+            db.close();
+            return false;
         }
-        db.close();
-        return false;
     }
 
     /*

@@ -9,8 +9,8 @@ import androidx.annotation.Nullable;
 
 public class Database extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 2;
-    private static final String DB_NAME = "playmap.db";
+    private static final int DB_VERSION = 3;
+    private static final String DB_NAME = "playMap3v.db";
     public static final String DB_TABLE_NAME = "markers";
     SQLiteDatabase db;
 
@@ -20,14 +20,13 @@ public class Database extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        /*
-            테이블 구조를 바꾸려면 이곳에 있는 생성 명령문을 수정하면 됩니다.
-            그리고나서 mMarker.addToDatabase에서 INSERT문을 수정하면 됩니다.
-            추가로 DB_VERSION까지 올려줘야 제대로 적용되는 걸로 알고 있습니다.
-         */
-        sqLiteDatabase.execSQL(
-                "CREATE TABLE "+DB_TABLE_NAME+" (lat decimal(19,5), lng decimal(19,5));"
-        );
+        sqLiteDatabase.execSQL("CREATE TABLE "+DB_TABLE_NAME+" ("
+                +"lat decimal(19,5) not null,"
+                +"lng decimal(19,5) not null,"
+                +"name varchar(20),"
+                +"description varchar(200),"
+                +"primary key(lat,lng)"
+                +");");
     }
 
     @Override

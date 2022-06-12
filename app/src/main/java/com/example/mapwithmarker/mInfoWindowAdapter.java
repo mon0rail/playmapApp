@@ -39,11 +39,7 @@ public class mInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
         TextView descText = layout.findViewById(R.id.txt_description_markerPopup);
         String snippet = marker.getSnippet();
-        if (snippet != null && snippet.contains("SHARABLE")){
-            descText.setText("클릭하여 마커 공유하기");
-        } else {
-            descText.setText(String.format("%3.3f, %3.3f",lat,lng));
-        }
+        descText.setText(snippet);
 
         TextView titleText = layout.findViewById(R.id.txt_title_markerPopup);
         String name = marker.getTitle();
