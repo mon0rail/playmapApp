@@ -527,6 +527,9 @@ public class MainActivity extends AppCompatActivity
                         showToast("설명의 길이는 최대 200자입니다.");
                     } else {
                         hideSoftKeyboard(MainActivity.this, view);
+                        if (description.length() == 0){
+                            description = "설명이 비어있습니다";
+                        }
                         double latDouble = Double.parseDouble(lat);
                         double lngDouble = Double.parseDouble(lng);
                         if (createNewMarker(latDouble, lngDouble, name, description)){
