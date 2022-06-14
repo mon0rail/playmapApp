@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@color/colorPrimary"
@@ -16,56 +16,85 @@
             android:layout_height="wrap_content"
             android:src="@drawable/icon_arrow_back"
             android:padding="20dp"
-            android:background="@android:color/transparent"/>
+            android:background="@android:color/transparent"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"/>
 
         <TextView
             android:layout_marginStart="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/page_1_title"
+            android:layout_toEndOf="@id/page_1_back_to_main"
+            android:layout_centerInParent="true"
             style="@style/txtPageTitle"/>
 
-    </LinearLayout>
+        <ImageButton
+            android:id="@+id/page_1_add_marker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_check_button"
+            android:padding="20dp"
+            android:background="@android:color/transparent"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="30dp"
+        android:layout_marginTop="10dp">
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="위도" />
+            android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/page_1_lat"
-            android:layout_width="wrap_content"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="위도"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="경도"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="4"
-            android:inputType="numberDecimal|numberSigned" />
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/page_1_lat"
+                android:layout_weight="2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal|numberSigned" />
+            <EditText
+                android:id="@+id/page_1_lng"
+                android:layout_weight="2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal|numberSigned" />
+        </LinearLayout>
     </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="경도" />
-
-        <EditText
-            android:id="@+id/page_1_lng"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="4"
-            android:inputType="numberDecimal|numberSigned" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="30dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -75,7 +104,7 @@
 
         <EditText
             android:id="@+id/page_1_name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:inputType="text" />
@@ -83,7 +112,10 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
@@ -94,30 +126,37 @@
 
         <EditText
             android:id="@+id/page_1_description"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:inputType="textMultiLine"
+            android:lines="3"
+            android:maxLines="3"
             android:scrollHorizontally="false" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/page_1_add_marker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="add marker" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp">
+        <Button
+            android:layout_margin="3dp"
+            android:id="@+id/page_1_reload_markers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="지도 새로고침"
+            android:background="@drawable/button_bg"
+            android:layout_weight="3"/>
 
-    <Button
-        android:id="@+id/page_1_reload_markers"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="reload markers" />
-
-    <Button
-        android:id="@+id/page_1_reset_all_markers"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="reset all markers" />
+        <Button
+            android:layout_margin="3dp"
+            android:id="@+id/page_1_reset_all_markers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="지도 초기화"
+            android:background="@drawable/button_bg_danger"
+            android:layout_weight="1"/>
+    </LinearLayout>
 
 
 </LinearLayout>

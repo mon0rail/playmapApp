@@ -898,6 +898,7 @@ public class MainActivity extends AppCompatActivity
         DB에 저장된 모든 마커 데이터를 지웁니다. 디버깅용 메소드입니다.
      */
     void resetAllMarkers(){
+        if (selectedMarker != null) selectedMarker.hideInfoWindow();
         map.clear();
         Database db = new Database(this);
         db.execSQL("DELETE FROM "+DB_TABLE_NAME);
@@ -918,6 +919,7 @@ public class MainActivity extends AppCompatActivity
         mMarker marker;
         String name, desc;
 
+        if (selectedMarker != null) selectedMarker.hideInfoWindow();
         map.clear();
         Cursor cursor = db.querySQL("SELECT * FROM "+DB_TABLE_NAME);
         if (cursor.getCount() != 0){

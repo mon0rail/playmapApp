@@ -1,106 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@color/colorPrimary"
         android:gravity="center_vertical">
 
+    <ImageButton
+        android:id="@+id/page_2_back_to_main"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/icon_arrow_back"
+        android:padding="20dp"
+        android:background="@android:color/transparent"
+        android:layout_alignParentStart="true"
+        android:layout_centerInParent="true"/>
+
+    <TextView
+        android:layout_marginStart="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/page_2_title"
+        android:layout_toEndOf="@+id/page_2_back_to_main"
+        android:layout_centerInParent="true"
+        style="@style/txtPageTitle"/>
+
+    <ImageButton
+        android:id="@+id/page_2_save_changes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/icon_check_button"
+        android:padding="20dp"
+        android:background="@android:color/transparent"
+        android:layout_alignParentRight="true"
+        android:layout_centerInParent="true"/>
+
+
         <ImageButton
-            android:id="@+id/page_2_back_to_main"
+            android:id="@+id/page_2_share_marker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/icon_arrow_back"
+            android:src="@drawable/icon_share"
             android:padding="20dp"
-            android:background="@android:color/transparent"/>
+            android:background="@android:color/transparent"
+            android:layout_toStartOf="@id/page_2_save_changes"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="30dp"
+        android:layout_marginTop="10dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="위도"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="경도"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/page_2_lat"
+                android:layout_weight="2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal|numberSigned" />
+            <EditText
+                android:id="@+id/page_2_lng"
+                android:layout_weight="2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal|numberSigned" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="30dp">
 
         <TextView
-            android:layout_marginStart="15dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/page_2_title"
-            style="@style/txtPageTitle"/>
+            android:layout_weight="1"
+            android:text="이름" />
 
+        <EditText
+            android:id="@+id/page_2_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:inputType="text" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="위도"
-            android:layout_weight="1"/>
-        <EditText android:id="@+id/page_2_lat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="none"
-            android:layout_weight="4"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="경도"
-            android:layout_weight="1"/>
-        <EditText android:id="@+id/page_2_lng"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="none"
-            android:layout_weight="4"/>
-    </LinearLayout>
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="이름"
-            android:layout_weight="1"/>
-        <EditText android:id="@+id/page_2_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="4"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="설명"
-            android:layout_weight="1"/>
-        <EditText android:id="@+id/page_2_description"
-            android:layout_width="wrap_content"
+            />
+
+        <EditText
+            android:id="@+id/page_2_description"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="4"/>
+            android:layout_weight="3"
+            android:inputType="textMultiLine"
+            android:lines="3"
+            android:maxLines="3"
+            android:scrollHorizontally="false" />
     </LinearLayout>
-
-    <Button android:id="@+id/page_2_save_changes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SAVE CHANGES"/>
-
-    <Button android:id="@+id/page_2_delete_marker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="DELETE MARKER"/>
-
-    <Button android:id="@+id/page_2_share_marker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SHARE MARKER"/>
 
     <TextView android:id="@+id/test"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="invisible"/>
+        android:visibility="gone"/>
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp">
+        <Button
+            android:layout_margin="3dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_bg"
+            android:visibility="invisible"
+            android:layout_weight="2" />
+
+        <Button
+            android:layout_margin="3dp"
+            android:id="@+id/page_2_delete_marker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="마커 삭제"
+            android:background="@drawable/button_bg_danger"
+            android:layout_weight="1"/>
+    </LinearLayout>
 </LinearLayout>

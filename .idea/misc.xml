@@ -18,8 +18,12 @@
         <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/layout/tab_icons_3.xml" value="0.1431159420289855" />
         <entry key="..\:/Users/ahshf/Desktop/PlayMap-1/app/src/main/res/layout/tabs_3_icon.xml" value="0.4" />
         <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/drawable-v23/view_card_marker.xml" value="0.1115" />
+        <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/drawable/button_bg.xml" value="0.215" />
+        <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/drawable/button_bg_danger.xml" value="0.215" />
         <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/drawable/icon_arrow_back.xml" value="0.1855" />
+        <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/drawable/icon_check_button.xml" value="0.215" />
         <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/drawable/icon_marker_1.xml" value="0.1855" />
+        <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/drawable/icon_share.xml" value="0.215" />
         <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/drawable/new_button.xml" value="0.1855" />
         <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/drawable/new_button_icon.xml" value="0.1855" />
         <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/drawable/new_button_shadow.xml" value="0.1855" />
@@ -32,7 +36,7 @@
         <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/layout/list_layout.xml" value="0.2140625" />
         <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/layout/marker_popup.xml" value="1.0" />
         <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/layout/page_0.xml" value="0.20989583333333334" />
-        <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/layout/page_1.xml" value="0.20989583333333334" />
+        <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/layout/page_1.xml" value="0.4" />
         <entry key="..\:/Users/ahshf/Desktop/playmapApp/app/src/main/res/layout/page_2.xml" value="0.20989583333333334" />
       </map>
     </option>
